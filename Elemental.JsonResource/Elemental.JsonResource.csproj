@@ -6,20 +6,14 @@
 		<PackageIconUrl>https://markpflug.github.io/MarkPflug.png</PackageIconUrl>
 		<Authors>Mark Pflug</Authors>
 		<Description>Json Resource DSL</Description>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 	
 	<ItemGroup>
 		<Content Include="build\*" PackagePath="build\" />
 	</ItemGroup>
-
-	<Target Name="AmendPackage" AfterTargets="Compile" BeforeTargets="_GetPackageFiles">
-		<ItemGroup>
-			<Content Include="$(TargetPath)" PackagePath="build\" />
-			<Content Include="$(TargetDir)\Newtonsoft.Json.dll" PackagePath="build\" />
-			<NuGetPackInput Include="@(Content)" />
-		</ItemGroup>
-	</Target>
 	
   <ItemGroup>
 		<PackageReference Include="Microsoft.Build.Framework" Version="15.3.409">
@@ -28,10 +22,25 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3">
+		<PackageReference Include="Newtonsoft.Json" Version="10.0.3">
 			<PrivateAssets>All</PrivateAssets>
-		</PackageReference>
+	</PackageReference>
   </ItemGroup>
+
+	<Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+		<!--
+		https://github.com/NuGet/Home/issues/5063
+    The include needs to happen after output has been copied to build output folder
+    but before NuGet generates a nuspec.
+    -->
+		<ItemGroup>
+			<_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll">
+				<PackagePath>tools\%(RecursiveDir)</PackagePath>
+				<Visible>false</Visible>
+				<BuildAction>Content</BuildAction>
+			</_PackageFiles>
+		</ItemGroup>
+	</Target>
 
 </Project>
   
