@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project
+	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+	<UsingTask AssemblyFile="Elemental.JsonResource.dll" TaskName="JsonResourceGenerator"/>
+
+	<Target Name="GenerateJsonResource" AfterTargets="ResGen" BeforeTargets="CoreCompile">
+
+		<PropertyGroup>
+			<CodeGenerationRoot>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</CodeGenerationRoot>
+		</PropertyGroup>
+
+		<JsonResourceGenerator
+			OutputPath="$(CodeGenerationRoot)"
+			InputFiles="@(JsonResource)"
+		>
+			<Output TaskParameter="OutputCode" ItemName="ResourceCodeFile"/>
+			<Output TaskParameter="OutputResources"  ItemName="ResourceResFile"/>
+		</JsonResourceGenerator>
+
+		<ItemGroup>
+			<Compile Include="@(ResourceCodeFile)"/>
+			<_CoreCompileResourceInputs Include="@(ResourceResFile)"/>
+			<Compile Remove="@(JsonResource)"/>
+		</ItemGroup>
+		
+	</Target>
+
+</Project>
