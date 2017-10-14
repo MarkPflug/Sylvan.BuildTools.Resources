@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
 		<VersionPrefix>0.1.0</VersionPrefix>
 		<PackageIconUrl>https://markpflug.github.io/MarkPflug.png</PackageIconUrl>
 		<Authors>Mark Pflug</Authors>
 		<Description>Json Resource DSL</Description>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
-		<BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+		<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 	
@@ -35,7 +35,7 @@
     -->
 		<ItemGroup>
 			<_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll">
-				<PackagePath>tools\%(RecursiveDir)</PackagePath>
+				<PackagePath>build\%(RecursiveDir)</PackagePath>
 				<Visible>false</Visible>
 				<BuildAction>Content</BuildAction>
 			</_PackageFiles>

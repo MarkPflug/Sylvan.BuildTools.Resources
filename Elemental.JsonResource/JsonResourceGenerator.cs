@@ -28,12 +28,19 @@ namespace Elemental.JsonResource
         // The method that is called to invoke our task.
         public override bool Execute()
         {
+            if (InputFiles == null)
+                return true;
+
+
+
             var outCodeItems = new List<TaskItem>();
             var outResItems = new List<TaskItem>();
 
             // loop over all the .resj files we were given
             foreach (var iFile in InputFiles)
             {
+                var fileDir = Path.GetDirectoryName(iFile.ItemSpec);
+                Log.LogMessage("RelativePath: " + fileDir);
                 // load the Json from the file
                 var text = File.ReadAllText(iFile.ItemSpec);
                 var obj = JObject.Parse(text);
@@ -82,6 +89,33 @@ namespace Elemental.JsonResource
 
                         // write our string to the resources binary
                         rw.AddResource(key, (string)value.Value);
+
+                        // generate a C# property to access the string by name.
+                        w.WriteLine("public static string " + key + " {");
+                        w.WriteLine("get {");
+                        w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+                        w.WriteLine("}");
+                        w.WriteLine("}");
+                    }
+
+                    // loop over all the strings in our resj file.
+                    foreach (var kvp in (JObject)obj["TextFiles"])
+                    {
+                        var key = kvp.Key;
+                        var fileName = (string) ((JValue)kvp.Value).Value;
+                        Path.Combine(fileDir, fileName);
+                        if(!File.Exists(fileName))
+                        {
+                            Log.LogError("Resource file not found: " + fileName);
+                        }
+
+                        using (var iStream = File.OpenRead(fileName))
+                        using (var reader = new StreamReader(iStream))
+                        {
+                            var txt = reader.ReadToEnd();
+                            // write our string to the resources binary
+                            rw.AddResource(key, txt);
+                        }
 
                         // generate a C# property to access the string by name.
                         w.WriteLine("public static string " + key + " {");
