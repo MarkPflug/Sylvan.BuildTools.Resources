@@ -12,6 +12,8 @@
 		<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<PackageTags>resj resource json</PackageTags>
+		<ApplicationIcon />
+		<StartupObject />
   </PropertyGroup>
 	
 	<ItemGroup>

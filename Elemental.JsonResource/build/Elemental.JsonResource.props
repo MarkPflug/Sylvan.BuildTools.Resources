@@ -9,6 +9,8 @@
 		</Compile>
 		<JsonResource>
 			<Generator>MSBuild:GenerateJsonResource</Generator>
+			<WithCulture>false</WithCulture>
+			<Type>Non-Resx</Type>
 		</JsonResource>
 	</ItemDefinitionGroup>
 

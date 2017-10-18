@@ -50,7 +50,10 @@ namespace Elemental.JsonResource
                 var resFile = Path.Combine(OutputPath, iFile.ItemSpec + ".resources");
 
                 outCodeItems.Add(new TaskItem(codeFile));
-                outResItems.Add(new TaskItem(resFile));
+                
+                var resItem = new TaskItem(resFile);
+                resItem.SetMetadata("LogicalName", iFile.ItemSpec + ".resources");
+                outResItems.Add(resItem);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
                 string resName = Path.GetFileName(iFile.ItemSpec);
