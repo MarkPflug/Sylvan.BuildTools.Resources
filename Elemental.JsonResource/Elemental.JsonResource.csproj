@@ -17,7 +17,9 @@
   </PropertyGroup>
 	
 	<ItemGroup>
-		<Content Include="build\*" PackagePath="build\" />
+		<Content Include="build\*" PackagePath="build\">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	
   <ItemGroup>

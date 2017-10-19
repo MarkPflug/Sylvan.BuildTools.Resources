@@ -101,31 +101,35 @@ namespace Elemental.JsonResource
                         w.WriteLine("}");
                     }
 
+                    var textFiles = (JObject)obj["TextFiles"];
                     // loop over all the strings in our resj file.
-                    foreach (var kvp in (JObject)obj["TextFiles"])
+                    if (textFiles != null)
                     {
-                        var key = kvp.Key;
-                        var fileName = (string) ((JValue)kvp.Value).Value;
-                        Path.Combine(fileDir, fileName);
-                        if(!File.Exists(fileName))
+                        foreach (var kvp in textFiles)
                         {
-                            Log.LogError("Resource file not found: " + fileName);
-                        }
+                            var key = kvp.Key;
+                            var fileName = (string)((JValue)kvp.Value).Value;
+                            Path.Combine(fileDir, fileName);
+                            if (!File.Exists(fileName))
+                            {
+                                Log.LogError("Resource file not found: " + fileName);
+                            }
 
-                        using (var iStream = File.OpenRead(fileName))
-                        using (var reader = new StreamReader(iStream))
-                        {
-                            var txt = reader.ReadToEnd();
-                            // write our string to the resources binary
-                            rw.AddResource(key, txt);
-                        }
+                            using (var iStream = File.OpenRead(fileName))
+                            using (var reader = new StreamReader(iStream))
+                            {
+                                var txt = reader.ReadToEnd();
+                                // write our string to the resources binary
+                                rw.AddResource(key, txt);
+                            }
 
-                        // generate a C# property to access the string by name.
-                        w.WriteLine("public static string " + key + " {");
-                        w.WriteLine("get {");
-                        w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-                        w.WriteLine("}");
-                        w.WriteLine("}");
+                            // generate a C# property to access the string by name.
+                            w.WriteLine("public static string " + key + " {");
+                            w.WriteLine("get {");
+                            w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+                            w.WriteLine("}");
+                            w.WriteLine("}");
+                        }
                     }
 
                     w.WriteLine("}");
