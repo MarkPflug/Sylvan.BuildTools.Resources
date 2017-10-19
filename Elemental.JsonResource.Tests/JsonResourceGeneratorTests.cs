@@ -1,6 +1,7 @@
 ﻿using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -43,8 +44,19 @@ namespace Elemental.JsonResource
         {
             this.o = o;
             this.logger = new XUnitTestLogger(o);
+        }
 
-          
+        string GetOutput(string exePath, string args)
+        {
+            var psi = new ProcessStartInfo(exePath, args) {
+                 UseShellExecute = false,
+                 RedirectStandardOutput = true,
+                 CreateNoWindow = true,
+            };
+            var proc = Process.Start(psi);
+            var text = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit();
+            return text;
         }
 
         [Fact]
@@ -54,7 +66,23 @@ namespace Elemental.JsonResource
             var pc = new ProjectCollection(gp);
             var proj = pc.LoadProject("Data/Proj1/Proj.csproj");
             var result = proj.Build(logger);
+            var exepath = proj.GetPropertyValue("TargetPath");
             Assert.True(result);
+            var message = GetOutput(exepath, "");
+            Assert.Equal("Hello, World\r\n", message);
+        }
+
+        [Fact]
+        public void BuildTest2()
+        {
+            MSBuildTest.Initialize();
+            var pc = new ProjectCollection(gp);
+            var proj = pc.LoadProject("Data/Proj1/Proj.csproj");
+            var result = proj.Build(logger);
+            var exepath = proj.GetPropertyValue("TargetPath");
+            Assert.True(result);
+            Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
+            Assert.Equal("Hallo, Welt\r\n", GetOutput(exepath, "de-DE"));
         }
     }
 }
