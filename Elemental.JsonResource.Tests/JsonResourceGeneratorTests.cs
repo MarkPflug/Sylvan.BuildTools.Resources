@@ -59,28 +59,29 @@ namespace Elemental.JsonResource
             return text;
         }
 
+        string BuildProject(string projFile) {
+            MSBuildTest.Initialize();
+            var pc = new ProjectCollection(gp);
+            var proj = pc.LoadProject(projFile);
+            var restored = proj.Build("Restore");
+            Assert.True(restored, "Failed to restore packages");
+            var result = proj.Build(logger);
+            var outputPath = proj.GetPropertyValue("TargetPath");
+            Assert.True(result, "Build failed");
+            return outputPath;
+        }
+
         [Fact]
         public void BuildTest()
         {
-            MSBuildTest.Initialize();
-            var pc = new ProjectCollection(gp);
-            var proj = pc.LoadProject("Data/Proj1/Proj.csproj");
-            var result = proj.Build(logger);
-            var exepath = proj.GetPropertyValue("TargetPath");
-            Assert.True(result);
-            var message = GetOutput(exepath, "");
-            Assert.Equal("Hello, World\r\n", message);
+            var exepath = BuildProject("Data/Proj1/Proj.csproj");
+            Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
         }
 
         [Fact]
         public void BuildTest2()
         {
-            MSBuildTest.Initialize();
-            var pc = new ProjectCollection(gp);
-            var proj = pc.LoadProject("Data/Proj1/Proj.csproj");
-            var result = proj.Build(logger);
-            var exepath = proj.GetPropertyValue("TargetPath");
-            Assert.True(result);
+            var exepath = BuildProject("Data/Proj2/Proj.csproj");
             Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
             Assert.Equal("Hallo, Welt\r\n", GetOutput(exepath, "de-DE"));
         }
