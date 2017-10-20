@@ -9,16 +9,29 @@ The benefits over resx are:
 - Doesn't require Visual Studio to function. (resx files don't work in VS Code for example)
 
 Json resource files use the ".resj" file extension, and a very simple json document to specify resources.
-Currently supports strings and text files. Text file path should be specified relative to the resj file location.
-Example file:
+Currently supports strings and text files. Text file path should be specified relative to the resj file location. Supports creating localized satellite assemblies using the same naming convention as resx.
+
+Example files:
+
+
+`[Resources.json]`
 ```json
 {
   "Strings": {
-    "FormLabel1": "First Name",
-    "FormLabel2": "Last Name",
-  },
-  "TextFiles": {
-    "BatchInsertSql": "sqlFiles/InsertBatchRecords.sql"
+    "Greeting": "Hello, Resj",
+    "Farewell": "Goodbye, Resx"
   }
 }
 ```
+
+`[Resources.de-DE.json]`
+```json
+{
+  "Strings": {
+    "Greeting": "Hallo, Resj",
+    "Farewell": "Auf Wiedersehen, Resx"
+  }
+}
+```
+
+Currently, only works with full .net framework builds, does not work with .net core builds. Working on that next...
