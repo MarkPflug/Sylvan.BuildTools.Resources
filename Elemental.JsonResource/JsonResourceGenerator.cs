@@ -16,6 +16,9 @@ namespace Elemental.JsonResource
 
         public static bool IsValidCulture(string name)
         {
+#if NETSTANDARD1_6
+            return true;
+#else
             if (cultures == null)
             {
                 lock (sync)
@@ -32,6 +35,7 @@ namespace Elemental.JsonResource
                 }
             }
             return cultures.Contains(name);
+#endif
         }
     }
 
@@ -95,8 +99,8 @@ namespace Elemental.JsonResource
 
                     string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
                     outCodeItems.Add(new TaskItem(codeFile));
-
-                    using (var w = new StreamWriter(codeFile))
+                    using(var oStream = new FileStream(codeFile, FileMode.Create))
+                    using (var w = new StreamWriter(oStream))
                     {
                         // very simplistic resource accessor class mostly duplicated from resx output.
                         w.WriteLine("public static partial class " + className + " { ");

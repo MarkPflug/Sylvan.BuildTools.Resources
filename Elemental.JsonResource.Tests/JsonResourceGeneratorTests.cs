@@ -85,5 +85,13 @@ namespace Elemental.JsonResource
             Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
             Assert.Equal("Hallo, Welt\r\n", GetOutput(exepath, "de-DE"));
         }
+
+        [Fact]
+        public void BuildTestNetStandard()
+        {
+            var exepath = BuildProject("Data/Proj3/Proj.csproj");
+            Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
+            Assert.Equal("Hallo, Welt\r\n", GetOutput(exepath, "de-DE"));
+        }
     }
 }
