@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ProjectSchemaDefinitions 
+    xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <ContentType
+        Name="JsonResource" 
+        DisplayName="Json resource file" 
+        ItemType="JsonResource" />
+
+    <ItemType 
+        Name="JsonResource" 
+        DisplayName="Json Resource File"/>
+
+    <FileExtension 
+        Name=".resj" 
+        ContentType="JsonResource" />
+
+</ProjectSchemaDefinitions>

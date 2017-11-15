@@ -4,7 +4,26 @@
 
 	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
 
-	<Target Name="GenerateJsonResource" BeforeTargets="BeforeBuild">
+	<ItemGroup>
+		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.xaml" />
+		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.ContentType.xaml" />
+		<AvailableItemname Include="JsonResource"/>
+	</ItemGroup>
+
+	<PropertyGroup>
+
+		<CoreCompileDependsOn>
+			GenerateJsonResource;
+			$(CoreCompileDependsOn)
+		</CoreCompileDependsOn>		
+		
+	</PropertyGroup>
+	
+	<Target 
+		Name="GenerateJsonResource" 
+		BeforeTargets="BeforeBuild"
+		Condition="'@(JsonResource)' != ''"
+	>
 
 		<PropertyGroup>
 			<CodeGenerationRoot>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</CodeGenerationRoot>
@@ -21,7 +40,6 @@
 		<ItemGroup>
 			<Compile Include="@(ResourceCodeFile)"/>
 			<EmbeddedResource Include="@(ResourceResFile)"/>
-			<Compile Remove="@(JsonResource)"/>
 		</ItemGroup>
 		
 	</Target>
