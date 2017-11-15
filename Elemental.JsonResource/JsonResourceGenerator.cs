@@ -66,6 +66,7 @@ namespace Elemental.JsonResource
             var outCodeItems = new List<TaskItem>();
             var outResItems = new List<TaskItem>();
 
+
             // loop over all the .resj files we were given
             foreach (var iFile in InputFiles)
             {
@@ -81,16 +82,25 @@ namespace Elemental.JsonResource
 
                 var fileDir = Path.GetDirectoryName(iFile.ItemSpec);
 
-                // load the Json from the file
-                var text = File.ReadAllText(iFile.ItemSpec);
-                var obj = JObject.Parse(text);
+                JObject obj = null;
+                try
+                {
+                    // load the Json from the file
+                    var text = File.ReadAllText(iFile.ItemSpec);
+                    obj = JObject.Parse(text);
+                }
+                catch (Exception e)
+                {
+                    obj = null;
+                }
+
 
                 string resName = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
                 var resourceName = resName + ".resources";
 
                 Directory.CreateDirectory(OutputPath);
 
-                
+
 
                 // write the generated C# code and resources file.
                 if (!hasCulture)
@@ -99,7 +109,7 @@ namespace Elemental.JsonResource
 
                     string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
                     outCodeItems.Add(new TaskItem(codeFile));
-                    using(var oStream = new FileStream(codeFile, FileMode.Create))
+                    using (var oStream = new FileStream(codeFile, FileMode.Create))
                     using (var w = new StreamWriter(oStream))
                     {
                         // very simplistic resource accessor class mostly duplicated from resx output.
@@ -123,29 +133,18 @@ namespace Elemental.JsonResource
                         w.WriteLine("}");
                         w.WriteLine("}");
 
-                        // loop over all the strings in our resj file.
-                        foreach (var kvp in (JObject)obj["Strings"])
+                        if (obj == null)
                         {
-                            var key = kvp.Key;
-                            var value = (JValue)kvp.Value;
-
-                            // generate a C# property to access the string by name.
-                            w.WriteLine("public static string " + key + " {");
-                            w.WriteLine("get {");
-                            w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-                            w.WriteLine("}");
-                            w.WriteLine("}");
+                            w.WriteLine("#error Failed to read input file " + iFile.ItemSpec);
                         }
-
-                        var textFiles = (JObject)obj["TextFiles"];
-                        // loop over all the strings in our resj file.
-                        if (textFiles != null)
+                        else
                         {
-                            foreach (var kvp in textFiles)
+
+                            // loop over all the strings in our resj file.
+                            foreach (var kvp in (JObject)obj["Strings"])
                             {
                                 var key = kvp.Key;
-                                var fileName = (string)((JValue)kvp.Value).Value;
-                                Path.Combine(fileDir, fileName);
+                                var value = (JValue)kvp.Value;
 
                                 // generate a C# property to access the string by name.
                                 w.WriteLine("public static string " + key + " {");
@@ -154,8 +153,26 @@ namespace Elemental.JsonResource
                                 w.WriteLine("}");
                                 w.WriteLine("}");
                             }
-                        }
 
+                            var textFiles = (JObject)obj["TextFiles"];
+                            // loop over all the strings in our resj file.
+                            if (textFiles != null)
+                            {
+                                foreach (var kvp in textFiles)
+                                {
+                                    var key = kvp.Key;
+                                    var fileName = (string)((JValue)kvp.Value).Value;
+                                    Path.Combine(fileDir, fileName);
+
+                                    // generate a C# property to access the string by name.
+                                    w.WriteLine("public static string " + key + " {");
+                                    w.WriteLine("get {");
+                                    w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+                                    w.WriteLine("}");
+                                    w.WriteLine("}");
+                                }
+                            }
+                        }
                         w.WriteLine("}");
                     }
                 }
@@ -180,39 +197,41 @@ namespace Elemental.JsonResource
 
                 }
 
-
                 using (var rw = new System.Resources.ResourceWriter(resFile))
                 {
-                    // loop over all the strings in our resj file.
-                    foreach (var kvp in (JObject)obj["Strings"])
+                    if (obj != null)
                     {
-                        var key = kvp.Key;
-                        var value = (JValue)kvp.Value;
-
-                        // write our string to the resources binary
-                        rw.AddResource(key, (string)value.Value);
-                    }
-
-                    var textFiles = (JObject)obj["TextFiles"];
-                    // loop over all the strings in our resj file.
-                    if (textFiles != null)
-                    {
-                        foreach (var kvp in textFiles)
+                        // loop over all the strings in our resj file.
+                        foreach (var kvp in (JObject)obj["Strings"])
                         {
                             var key = kvp.Key;
-                            var fileName = (string)((JValue)kvp.Value).Value;
-                            Path.Combine(fileDir, fileName);
-                            if (!File.Exists(fileName))
-                            {
-                                Log.LogError("Resource file not found: " + fileName);
-                            }
+                            var value = (JValue)kvp.Value;
 
-                            using (var iStream = File.OpenRead(fileName))
-                            using (var reader = new StreamReader(iStream))
+                            // write our string to the resources binary
+                            rw.AddResource(key, (string)value.Value);
+                        }
+
+                        var textFiles = (JObject)obj["TextFiles"];
+                        // loop over all the strings in our resj file.
+                        if (textFiles != null)
+                        {
+                            foreach (var kvp in textFiles)
                             {
-                                var txt = reader.ReadToEnd();
-                                // write our string to the resources binary
-                                rw.AddResource(key, txt);
+                                var key = kvp.Key;
+                                var fileName = (string)((JValue)kvp.Value).Value;
+                                Path.Combine(fileDir, fileName);
+                                if (!File.Exists(fileName))
+                                {
+                                    Log.LogError("Resource file not found: " + fileName);
+                                }
+
+                                using (var iStream = File.OpenRead(fileName))
+                                using (var reader = new StreamReader(iStream))
+                                {
+                                    var txt = reader.ReadToEnd();
+                                    // write our string to the resources binary
+                                    rw.AddResource(key, txt);
+                                }
                             }
                         }
                     }
