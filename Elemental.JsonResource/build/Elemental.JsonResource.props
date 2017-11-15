@@ -3,7 +3,9 @@
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
-		<JsonResourceTaskAssembly Condition="'$(JsonResourceTaskAssembly)' == ''">net461\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
+
+		<JsonResourceTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Full' And '$(JsonResourceTaskAssembly)' == ''">net461\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
+		<JsonResourceTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Core' And'$(JsonResourceTaskAssembly)' == ''">net461\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
 	</PropertyGroup>
 
 	<ItemDefinitionGroup>

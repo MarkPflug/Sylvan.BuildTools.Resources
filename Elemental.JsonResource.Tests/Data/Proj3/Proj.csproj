@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<CodeGenTestRoot>../../../../../../Elemental.JsonResource/bin/Debug/net461/Build/</CodeGenTestRoot>
+		<CodeGenTestRoot>../../../../../../Elemental.JsonResource/bin/Debug/netstandard1.6/Build/</CodeGenTestRoot>
 		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
 		<OutputType>Exe</OutputType>
 		<StartupObject></StartupObject>

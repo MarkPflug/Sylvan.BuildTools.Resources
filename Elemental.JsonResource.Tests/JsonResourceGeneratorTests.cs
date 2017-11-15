@@ -1,5 +1,7 @@
 ﻿using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,7 +28,6 @@ namespace Elemental.JsonResource
             var instProp = behType.GetProperties().FirstOrDefault(p => p.Name == "Instance");
             singletonField.SetValue(null, be);
         }
-
     }
 
     public class JsonResourceGeneratorTests
@@ -49,9 +50,9 @@ namespace Elemental.JsonResource
         string GetOutput(string exePath, string args)
         {
             var psi = new ProcessStartInfo(exePath, args) {
-                 UseShellExecute = false,
-                 RedirectStandardOutput = true,
-                 CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
             };
             var proc = Process.Start(psi);
             var text = proc.StandardOutput.ReadToEnd();
@@ -59,11 +60,31 @@ namespace Elemental.JsonResource
             return text;
         }
 
-        string BuildProject(string projFile) {
+        void LogProps(Project proj)
+        {
+            foreach (var kvp in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().OrderBy(e => e.Key))
+            {
+                o.WriteLine(kvp.Key + ": " + kvp.Value);
+
+            }
+
+            foreach (var prop in proj.AllEvaluatedProperties.OrderBy(p => p.Name))
+            {
+                o.WriteLine(prop.Name + ": " + prop.EvaluatedValue + " (" + prop.UnevaluatedValue + ")");
+            }
+        }
+
+        string BuildProject(string projFile)
+        {
+
             MSBuildTest.Initialize();
             var pc = new ProjectCollection(gp);
             var proj = pc.LoadProject(projFile);
-            var restored = proj.Build("Restore");
+            var restored = proj.Build("Restore", new[] { logger });
+            if (!restored)
+            {
+                LogProps(proj);
+            }
             Assert.True(restored, "Failed to restore packages");
             var result = proj.Build(logger);
             var outputPath = proj.GetPropertyValue("TargetPath");
