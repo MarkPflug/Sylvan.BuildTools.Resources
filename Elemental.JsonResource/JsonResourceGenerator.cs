@@ -123,6 +123,7 @@ namespace Elemental.JsonResource
                             w.WriteLine("namespace " + ns + " {");
                         }
 
+                        w.WriteLine("using global::System.Reflection;");
                         // very simplistic resource accessor class mostly duplicated from resx output.
                         w.WriteLine("public static partial class " + className + " { ");
                         w.WriteLine("static global::System.Resources.ResourceManager rm;");
@@ -130,7 +131,7 @@ namespace Elemental.JsonResource
                         w.WriteLine("static global::System.Resources.ResourceManager ResourceManager {");
                         w.WriteLine("get {");
                         w.WriteLine("if(object.ReferenceEquals(rm, null)) {");
-                        w.WriteLine("rm = new global::System.Resources.ResourceManager(\"" + resName + "\", typeof(" + className + ").Assembly);");
+                        w.WriteLine("rm = new global::System.Resources.ResourceManager(\"" + resName + "\", typeof(" + className + ").GetTypeInfo().Assembly);");
                         w.WriteLine("}");
                         w.WriteLine("return rm;");
                         w.WriteLine("}");
