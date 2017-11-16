@@ -9,7 +9,6 @@
 
 	<ItemDefinitionGroup>
 		<JsonResource>
-			<Namespace>$(RootNamespace)</Namespace>
 			<Generator>MSBuild:GenerateJsonResource</Generator>
 		</JsonResource>
 	</ItemDefinitionGroup>

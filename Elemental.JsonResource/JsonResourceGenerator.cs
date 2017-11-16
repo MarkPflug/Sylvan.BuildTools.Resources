@@ -89,8 +89,9 @@ namespace Elemental.JsonResource
                     var text = File.ReadAllText(iFile.ItemSpec);
                     obj = JObject.Parse(text);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
+                    Log.LogError(null, null, null, iFile.ItemSpec, 0, 0, 0, 0, "Failed to load json resource file");
                     obj = null;
                 }
 
@@ -107,11 +108,21 @@ namespace Elemental.JsonResource
                 {
                     var codeFile = Path.Combine(OutputPath, iFile.ItemSpec + ".g.cs");
 
+                    var ns = iFile.GetMetadata("Namespace");
+
+
+
                     string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
                     outCodeItems.Add(new TaskItem(codeFile));
+                    Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
                     using (var oStream = new FileStream(codeFile, FileMode.Create))
                     using (var w = new StreamWriter(oStream))
                     {
+                        if(!string.IsNullOrEmpty(ns))
+                        {
+                            w.WriteLine("namespace " + ns + " {");
+                        }
+
                         // very simplistic resource accessor class mostly duplicated from resx output.
                         w.WriteLine("public static partial class " + className + " { ");
                         w.WriteLine("static global::System.Resources.ResourceManager rm;");
@@ -133,13 +144,8 @@ namespace Elemental.JsonResource
                         w.WriteLine("}");
                         w.WriteLine("}");
 
-                        if (obj == null)
+                        if (obj != null)
                         {
-                            w.WriteLine("#error Failed to read input file " + iFile.ItemSpec);
-                        }
-                        else
-                        {
-
                             // loop over all the strings in our resj file.
                             foreach (var kvp in (JObject)obj["Strings"])
                             {
@@ -174,6 +180,11 @@ namespace Elemental.JsonResource
                             }
                         }
                         w.WriteLine("}");
+
+                        if (!string.IsNullOrEmpty(ns))
+                        {
+                            w.WriteLine("}");
+                        }
                     }
                 }
 
