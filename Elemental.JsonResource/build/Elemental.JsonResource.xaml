@@ -10,6 +10,6 @@
     <Rule.DataSource>
         <DataSource Persistence="ProjectFile" ItemType="JsonResource" />
     </Rule.DataSource>
-    <StringProperty Name="Namespace" DisplayName="Namespace for generated class" />
+    <StringProperty Name="Namespace" DisplayName="Namespace" />
     <StringProperty Name="Generator" DisplayName="Custom Tool" />
 </Rule>

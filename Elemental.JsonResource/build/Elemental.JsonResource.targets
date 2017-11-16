@@ -3,6 +3,7 @@
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
+	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="DetermineNamespace"/>
 
 	<ItemGroup>
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.xaml" />
@@ -28,6 +29,18 @@
 		<PropertyGroup>
 			<CodeGenerationRoot>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</CodeGenerationRoot>
 		</PropertyGroup>
+
+		<ItemGroup>
+			<JsonResourceTemp Include="@(JsonResource)"/>
+			<JsonResource Remove="@(JsonResource)"/>
+		</ItemGroup>
+
+		<DetermineNamespace 
+			Items="@(JsonResourceTemp)"
+			NamespaceRoot="$(RootNamespace)">
+			<Output TaskParameter="Output"
+							ItemName="JsonResource"/>
+		</DetermineNamespace>
 
 		<JsonResourceGenerator
 			OutputPath="$(CodeGenerationRoot)"
