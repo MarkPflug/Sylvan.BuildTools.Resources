@@ -33,5 +33,3 @@ Example files:
   }
 }
 ```
-
-Currently, only works with full .net framework builds, does not work with .net core builds. Working on that next...
