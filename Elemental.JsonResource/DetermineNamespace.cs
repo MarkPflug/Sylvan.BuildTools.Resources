@@ -6,66 +6,67 @@ using System.Text.RegularExpressions;
 
 namespace Elemental.JsonResource
 {
-    public class DetermineNamespace : Task
-    {
-        public string NamespaceRoot { get; set; }
+	public class DetermineNamespace : Task
+	{
+		public string NamespaceRoot { get; set; }
 
-        public ITaskItem[] Items { get; set; }
+		public ITaskItem[] Items { get; set; }
 
-        [Output]
-        public ITaskItem[] Output { get; set; }
+		[Output]
+		public ITaskItem[] Output { get; set; }
 
-        const string Separator = ".";
-        const string NamespaceMetadata = "Namespace";
-        static readonly char[] PathSeparators = new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+		const string Separator = ".";
+		const string NamespaceMetadata = "Namespace";
+		static readonly char[] PathSeparators = new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
 
-        static string ToIdentifier(string str)
-        {
-            str = Regex.Replace(str, "\\s+", "");
-            return str;
-        }
+		static string ToIdentifier(string str)
+		{
+			str = Regex.Replace(str, "\\s+", "");
+			return str;
+		}
 
-        static string Combine(params string[] parts)
-        {
-            var sb = new StringBuilder();
+		static string Combine(params string[] parts)
+		{
+			var sb = new StringBuilder();
 
-            foreach(var part in parts)
-            {
-                var id = ToIdentifier(part);
-                
-                if(!string.IsNullOrEmpty(id)) {
-                    if (sb.Length > 0)
-                        sb.Append(Separator);
-                    sb.Append(id);
-                }
-            }
+			foreach (var part in parts)
+			{
+				var id = ToIdentifier(part);
 
-            return sb.ToString();
-        }
+				if (!string.IsNullOrEmpty(id))
+				{
+					if (sb.Length > 0)
+						sb.Append(Separator);
+					sb.Append(id);
+				}
+			}
 
-        public override bool Execute()
-        {
-            if (Items == null)
-                return true;
+			return sb.ToString();
+		}
 
-            var nsRoot = NamespaceRoot ?? "";
+		public override bool Execute()
+		{
+			if (Items == null)
+				return true;
 
-            foreach (var item in Items)
-            {
-                if (!string.IsNullOrEmpty(item.GetMetadata(NamespaceMetadata)))
-                    continue;
+			var nsRoot = NamespaceRoot ?? "";
 
-                var dir = Path.GetDirectoryName(item.ItemSpec);
+			foreach (var item in Items)
+			{
+				if (!string.IsNullOrEmpty(item.GetMetadata(NamespaceMetadata)))
+					continue;
 
-                var parts = dir.Split(PathSeparators);
+				var dir = Path.GetDirectoryName(item.ItemSpec);
 
-                var ns = Combine(NamespaceRoot, Combine(parts));
+				var parts = dir.Split(PathSeparators);
 
-                item.SetMetadata(NamespaceMetadata, ns);                
-            }
+				var ns = Combine(NamespaceRoot, Combine(parts));
 
-            Output = Items;
-            return true;
-        }
-    }
+				item.SetMetadata(NamespaceMetadata, ns);
+			}
+
+			Output = Items;
+			return true;
+		}
+	}
 }

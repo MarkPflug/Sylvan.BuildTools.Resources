@@ -11,5 +11,5 @@
         <DataSource Persistence="ProjectFile" ItemType="JsonResource" />
     </Rule.DataSource>
     <StringProperty Name="Namespace" DisplayName="Namespace" />
-    <StringProperty Name="Generator" DisplayName="Custom Tool" />
+    <StringProperty Name="ResourceName" DisplayName="Resource Name" />
 </Rule>
