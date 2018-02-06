@@ -394,6 +394,7 @@ namespace Elemental.Json
 							HandleError();
 							goto start;
 						}
+						this.SyntaxKind = SyntaxKind.ArrayEnd;
 						return true;
 					case TokenKind.EndObject:
 						if (Peek() == Context.Object) {
@@ -403,6 +404,7 @@ namespace Elemental.Json
 							HandleError();
 							goto start;
 						}
+						this.SyntaxKind = SyntaxKind.ObjectEnd;
 						return true;
 					default:
 						HandleError(JsonErrorCode.MissingComma, lastEnd);

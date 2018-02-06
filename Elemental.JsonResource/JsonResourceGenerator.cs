@@ -57,40 +57,40 @@ namespace Elemental.JsonResource
 		[Output]
 		public ITaskItem[] OutputResources { get; set; }
 
-        enum Section
-        {
-            None = 0,
-            Strings,
-            Files
-        }
+		enum Section
+		{
+			None = 0,
+			Strings,
+			Files
+		}
 
-        bool hasError = false;
+		bool hasError = false;
 
-        class FileErrorLogger
-        {
-            JsonResourceGenerator task;
-            string file;
+		class FileErrorLogger
+		{
+			JsonResourceGenerator task;
+			string file;
 
-            public FileErrorLogger(JsonResourceGenerator task, string file)
-            {
-                this.task = task;
-                this.file = file;
-            }
+			public FileErrorLogger(JsonResourceGenerator task, string file)
+			{
+				this.task = task;
+				this.file = file;
+			}
 
-            public bool JsonError(JsonErrorCode error, Location loc)
-            {
-                task.hasError = true;
-                task.Log.LogError(null, "JP" + ((int)error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
-                return true;
-            }
+			public bool JsonError(JsonErrorCode error, Location loc)
+			{
+				task.hasError = true;
+				task.Log.LogError(null, "JP" + ((int) error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
+				return true;
+			}
 
-            public void ParseError(string message, JsonReader reader)
-            {
-                task.Log.LogError(null, "JS0001", null, file, reader.Start.Line, reader.Start.Column, reader.End.Line, reader.End.Column, message, null);
-            }
-        }
+			public void ParseError(string message, JsonReader reader)
+			{
+				task.Log.LogError(null, "JS0001", null, file, reader.Start.Line, reader.Start.Column, reader.End.Line, reader.End.Column, message, null);
+			}
+		}
 
-        
+
 
 		// The method that is called to invoke our task.
 		public override bool Execute()
@@ -116,17 +116,17 @@ namespace Elemental.JsonResource
 				}
 
 				var fileDir = Path.GetDirectoryName(iFile.ItemSpec);
-                var filePath = iFile.ItemSpec;
+				var filePath = iFile.ItemSpec;
 
-                var logger = new FileErrorLogger(this, filePath);
+				var logger = new FileErrorLogger(this, filePath);
 
-                // load the Json from the file
-                var text = File.ReadAllText(filePath);
-                var json = new JsonReader(new StringReader(text), logger.JsonError);
+				// load the Json from the file
+				var text = File.ReadAllText(filePath);
+				var json = new JsonReader(new StringReader(text), logger.JsonError);
 
 				var resName = iFile.GetMetadata("ResourceName");
 
-				if(string.IsNullOrEmpty(resName))
+				if (string.IsNullOrEmpty(resName))
 				{
 					resName = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 				}
@@ -145,6 +145,10 @@ namespace Elemental.JsonResource
 					string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 					outCodeItems.Add(new TaskItem(codeFile));
 					Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
+
+
+
+
 					using (var oStream = new FileStream(codeFile, FileMode.Create))
 					using (var w = new StreamWriter(oStream))
 					{
@@ -175,91 +179,103 @@ namespace Elemental.JsonResource
 						w.WriteLine("}");
 						w.WriteLine("}");
 
-                        if (!json.Read() || json.SyntaxKind != SyntaxKind.ObjectStart)
-                            Log.LogError(filePath, "Expected root object element.", json);
+						if (!json.Read() || json.SyntaxKind != SyntaxKind.ObjectStart)
+							Log.LogError(filePath, "Expected root object element.", json);
 
-                        Section section = Section.None;
+						Section section = Section.None;
 
-                        while(json.Read()) {
-                            switch(section) {
-                            case Section.None:
-                                switch(json.SyntaxKind) {
-                                case SyntaxKind.PropertyName:
-                                    var name = json.PropertyName;
-                                    var ln = name.ToLower();
+						while (json.Read())
+						{
+							switch (section)
+							{
+							case Section.None:
+								switch (json.SyntaxKind)
+								{
+								case SyntaxKind.PropertyName:
+									var name = json.PropertyName;
+									var ln = name.ToLower();
 
-                                    switch(ln) {
-                                    case "string":
-                                        section = Section.Strings;
-                                        if(!json.Read()) {
-                                            logger.ParseError("Expected end of file.", json);
-                                            goto end;
-                                        }
-                                        if(json.SyntaxKind != SyntaxKind.ObjectStart) {
-                                            logger.ParseError("Expected object start", json);
-                                            goto end;
-                                        }
-                                        break;                                        
-                                    case "files":
-                                        section = Section.Files;
-                                        if (!json.Read()) {
-                                            logger.ParseError("Expected end of file.", json);
-                                            goto end;
-                                        }
-                                        if (json.SyntaxKind != SyntaxKind.ObjectStart) {
-                                            logger.ParseError("Expected object start", json);
-                                            goto end;
-                                        }
-                                        break;
-                                    default:
-                                        logger.ParseError("Unexpected section " + name, json);
-                                        goto end;
-                                    }
-                                    break;
-                                case SyntaxKind.ObjectEnd:
-                                    if (json.Read()) {
-                                        logger.ParseError("Expected end of file.", json);
-                                    }
-                                    break;
-                                default:
-                                    logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-                                    goto end;
-                                }
-                                break;
-                            case Section.Strings:
-                            case Section.Files:
-                                while (true) {
-                                    if(!json.Read())
-                                        logger.ParseError("Unexpected end of file.", json);
-                                    switch (json.SyntaxKind) {
-                                    case SyntaxKind.PropertyName:
-                                        var name = json.PropertyName;
-                                        if (!json.Read()) {
-                                            logger.ParseError("Unexpected end of file.", json);
-                                        }
-                                        if(json.SyntaxKind == SyntaxKind.StringValue) {
-                                            w.WriteLine("public static string " + name + " {");
-                                            w.WriteLine("get {");
-                                            w.WriteLine("return ResourceManager.GetString(\"" + name + "\", resourceCulture);");
-                                            w.WriteLine("}");
-                                            w.WriteLine("}");
-                                        } else {
-                                            logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-                                        }
-                                        break;
-                                    case SyntaxKind.ObjectEnd:
-                                        section = Section.None;
-                                        break;
-                                    default:
-                                        logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        } 
-                        end:
-						
+									switch (ln)
+									{
+									case "strings":
+										section = Section.Strings;
+										if (!json.Read())
+										{
+											logger.ParseError("Expected end of file.", json);
+											goto end;
+										}
+										if (json.SyntaxKind != SyntaxKind.ObjectStart)
+										{
+											logger.ParseError("Expected object start", json);
+											goto end;
+										}
+										break;
+									case "files":
+										section = Section.Files;
+										if (!json.Read())
+										{
+											logger.ParseError("Expected end of file.", json);
+											goto end;
+										}
+										if (json.SyntaxKind != SyntaxKind.ObjectStart)
+										{
+											logger.ParseError("Expected object start", json);
+											goto end;
+										}
+										break;
+									default:
+										logger.ParseError("Unexpected section " + name, json);
+										goto end;
+									}
+									break;
+								case SyntaxKind.ObjectEnd:
+									if (json.Read())
+									{
+										logger.ParseError("Expected end of file.", json);
+									}
+									break;
+								default:
+									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+									goto end;
+								}
+								break;
+							case Section.Strings:
+							case Section.Files:
+								switch (json.SyntaxKind)
+								{
+								case SyntaxKind.PropertyName:
+									var name = json.PropertyName;
+									if (!json.Read())
+									{
+										logger.ParseError("Unexpected end of file.", json);
+									}
+									if (json.SyntaxKind == SyntaxKind.StringValue)
+									{
+										w.WriteLine("public static string " + name + " {");
+										w.WriteLine("get {");
+										w.WriteLine("return ResourceManager.GetString(\"" + name + "\", resourceCulture);");
+										w.WriteLine("}");
+										w.WriteLine("}");
+									}
+									else
+									{
+										logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+										break;
+									}
+
+									break;
+								case SyntaxKind.ObjectEnd:
+									section = Section.None;
+									break;
+								default:
+									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+									break;
+								}
+								break;
+							}
+						}
+						end:
+
 						w.WriteLine("}");
 
 						if (!string.IsNullOrEmpty(ns))
@@ -268,6 +284,10 @@ namespace Elemental.JsonResource
 						}
 					}
 				}
+
+
+
+
 
 				// prepare the generated files we are about to write.
 				var resFile = Path.Combine(OutputPath, resourceName);
@@ -279,6 +299,8 @@ namespace Elemental.JsonResource
 
 				resItem.SetMetadata("WithCulture", hasCulture ? "true" : "false");
 				resItem.SetMetadata("Type", "Non-Resx");
+
+				outResItems.Add(resItem);
 				if (hasCulture)
 				{
 					resItem.SetMetadata("Culture", culturePart);
@@ -288,52 +310,127 @@ namespace Elemental.JsonResource
 
 				}
 
-				//using (var rw = new System.Resources.ResourceWriter(resFile))
-				//{
-				//	if (obj != null)
-				//	{
-				//		// loop over all the strings in our resj file.
-				//		foreach (var kvp in (JObject)obj["Strings"])
-				//		{
-				//			var key = kvp.Key;
-				//			var value = (JValue)kvp.Value;
+				json = new JsonReader(new StringReader(text), logger.JsonError);
+				using (var rw = new System.Resources.ResourceWriter(resFile))
+				{
+					if (!json.Read() || json.SyntaxKind != SyntaxKind.ObjectStart)
+						Log.LogError(filePath, "Expected root object element.", json);
 
-				//			// write our string to the resources binary
-				//			rw.AddResource(key, (string)value.Value);
-				//		}
+					Section section = Section.None;
 
-				//		var textFiles = (JObject)obj["TextFiles"];
-				//		// loop over all the strings in our resj file.
-				//		if (textFiles != null)
-				//		{
-				//			foreach (var kvp in textFiles)
-				//			{
-				//				var key = kvp.Key;
-				//				var fileName = (string)((JValue)kvp.Value).Value;
-				//				Path.Combine(fileDir, fileName);
-				//				if (!File.Exists(fileName))
-				//				{
-				//					Log.LogError("Resource file not found: " + fileName);
-				//				}
+					while (json.Read())
+					{
+						switch (section)
+						{
+						case Section.None:
+							switch (json.SyntaxKind)
+							{
+							case SyntaxKind.PropertyName:
+								var name = json.PropertyName;
+								var ln = name.ToLower();
 
-				//				using (var iStream = File.OpenRead(fileName))
-				//				using (var reader = new StreamReader(iStream))
-				//				{
-				//					var txt = reader.ReadToEnd();
-				//					// write our string to the resources binary
-				//					rw.AddResource(key, txt);
-				//				}
-				//			}
-				//		}
-				//	}
+								switch (ln)
+								{
+								case "strings":
+									section = Section.Strings;
+									if (!json.Read())
+									{
+										logger.ParseError("Expected end of file.", json);
+										goto end;
+									}
+									if (json.SyntaxKind != SyntaxKind.ObjectStart)
+									{
+										logger.ParseError("Expected object start", json);
+										goto end;
+									}
+									break;
+								case "files":
+									section = Section.Files;
+									if (!json.Read())
+									{
+										logger.ParseError("Expected end of file.", json);
+										goto end;
+									}
+									if (json.SyntaxKind != SyntaxKind.ObjectStart)
+									{
+										logger.ParseError("Expected object start", json);
+										goto end;
+									}
+									break;
+								default:
+									logger.ParseError("Unexpected section " + name, json);
+									goto end;
+								}
+								break;
+							case SyntaxKind.ObjectEnd:
+								if (json.Read())
+								{
+									logger.ParseError("Expected end of file.", json);
+								}
+								break;
+							default:
+								logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+								goto end;
+							}
+							break;
+						case Section.Strings:
+						case Section.Files:
+							switch (json.SyntaxKind)
+							{
+							case SyntaxKind.PropertyName:
+								var name = json.PropertyName;
+								if (!json.Read())
+								{
+									logger.ParseError("Unexpected end of file.", json);
+								}
+								if (json.SyntaxKind == SyntaxKind.StringValue)
+								{
+									// loop over all the strings in our resj file.
+									if (section == Section.Strings)
+									{
+										// write our string to the resources binary
+										rw.AddResource(name, json.StringValue);
+									}
+									else
+									if (section == Section.Files)
+									{
 
-				//	if (hasCulture)
-				//	{
+										var textFilePath = Path.Combine(fileDir, name);
+										if (!File.Exists(textFilePath))
+										{
+											logger.ParseError("File not found.", json);
+										}
 
-				//	}
-				//	outResItems.Add(resItem);
-				//}
+										using (var iStream = File.OpenRead(textFilePath))
+										using (var reader = new StreamReader(iStream))
+										{
+											var txt = reader.ReadToEnd();
+											// write our string to the resources binary
+											rw.AddResource(name, txt);
+										}
+									}
+								}
+								else
+								{
+									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+									break;
+								}
+
+								break;
+							case SyntaxKind.ObjectEnd:
+								section = Section.None;
+								break;
+							default:
+								logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
+								break;
+							}
+							break;
+						}
+					}
+					end:;
+				}
 			}
+
 			// put the artifacts we created in the output properties.
 			OutputCode = outCodeItems.ToArray();
 			OutputResources = outResItems.ToArray();
@@ -341,3 +438,4 @@ namespace Elemental.JsonResource
 		}
 	}
 }
+

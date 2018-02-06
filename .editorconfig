@@ -1,0 +1,7 @@
+
+[*.cs]
+indent_style                      = tab
+indent_size                       = tab
+tab_size                          = 4
+
+csharp_new_line_before_open_brace = all

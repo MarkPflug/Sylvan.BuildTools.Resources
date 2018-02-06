@@ -22,10 +22,10 @@
 	</ItemGroup>
 	
   <ItemGroup>
-		<PackageReference Include="Microsoft.Build.Framework" Version="15.3.409">
+		<PackageReference Include="Microsoft.Build.Framework" Version="15.5.180">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409">
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
   </ItemGroup>
