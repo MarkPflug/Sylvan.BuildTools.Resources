@@ -12,8 +12,7 @@
 		<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<PackageTags>resj resource json</PackageTags>
-		<ApplicationIcon />
-		<StartupObject />
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 	
 	<ItemGroup>
@@ -29,9 +28,10 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="10.0.3">
-			<PrivateAssets>All</PrivateAssets>
-	</PackageReference>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="Json\" />
   </ItemGroup>
 
 	<Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
