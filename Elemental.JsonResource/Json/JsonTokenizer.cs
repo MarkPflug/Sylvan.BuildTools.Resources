@@ -98,7 +98,7 @@ namespace Elemental.Json
 				{
 				case -1:
 					Start = End = Location;
-					TokenKind = TokenKind.EndOfText;
+					TokenKind = TokenKind.None;
 					return false;
 				case '\"':
 				case '\'':
@@ -291,6 +291,13 @@ namespace Elemental.Json
 					break;
 				if (c == '\\')
 				{
+					if (i >= bufferPos)
+					{
+						// nothing following the '\', just write it and exit
+						writer.Write('\\');
+						break;
+					}
+
 					var n = buffer[i++];
 					switch (n)
 					{
@@ -319,16 +326,39 @@ namespace Elemental.Json
 						writer.Write('\t');
 						break;
 					case 'u':
-						throw new NotImplementedException();
+						int accum = 0;
+
+						for (int d = 0; d < 4; d++)
+						{
+							if (i >= bufferPos)
+								break;
+
+							var digit = buffer[i++];
+							if (digit >= '0' && digit <= '9')
+								accum = (accum << 4) | (digit - '0');
+							else if (digit >= 'a' && digit <= 'f')
+								accum = (accum << 4) | (10 + digit - 'a');
+							else if (digit >= 'A' && digit <= 'F')
+								accum = (accum << 4) | (10 + digit - 'A');
+							else
+							{
+								i--;
+								break;
+							}
+						}
+						writer.Write((char) accum);
+						break;
 					default:
-						throw new InvalidOperationException();
+						// bad escape sequence, just write it as a literal.
+						writer.Write('\\');
+						writer.Write(n);
+						break;
 					}
 					count++;
 				}
 				else
 				{
 					writer.Write((char) c);
-
 					count++;
 				}
 			}
@@ -345,6 +375,14 @@ namespace Elemental.Json
 					return false;
 			}
 			return true;
+		}
+
+		bool IsHexDigit(int c)
+		{
+			return
+				c >= '0' && c <= '9' ||
+				c >= 'a' && c <= 'f' ||
+				c >= 'A' && c <= 'F';
 		}
 
 		public SyntaxKind GetValueSyntaxKind()
@@ -365,7 +403,7 @@ namespace Elemental.Json
 				var c = Peek();
 				if (c == -1)
 				{
-					HandleError(JsonErrorCode.UnexpectedEndOfFile);
+					HandleError(JsonErrorCode.UnexpectedEndOfText);
 					break;
 				}
 
@@ -465,34 +503,41 @@ namespace Elemental.Json
 		bool FillBuffer()
 		{
 			var offset = bufferPos - bufferTokenStart;
-			if (bufferTokenStart == 0)
+			if (bufferEnd != 0)
 			{
-				// need a bigger buffer;
-				var newLen = GetNewBufferSize();
-				var buffer = new char[newLen];
-				Array.Copy(this.buffer, bufferTokenStart, buffer, 0, bufferEnd - bufferTokenStart);
-				this.buffer = buffer;
-			}
-			else
-			{
-				Array.Copy(this.buffer, bufferTokenStart, this.buffer, 0, bufferEnd - bufferTokenStart);
+				if (bufferTokenStart == 0)
+				{
+					// need a bigger buffer;
+					var newLen = GetNewBufferSize();
+					var buffer = new char[newLen];
+					Array.Copy(this.buffer, bufferTokenStart, buffer, 0, bufferEnd - bufferTokenStart);
+					this.buffer = buffer;
+				}
+				else
+				{
+					Array.Copy(this.buffer, bufferTokenStart, this.buffer, 0, bufferEnd - bufferTokenStart);
+				}
 			}
 			this.bufferTokenStart = 0;
 
 			bufferPos = offset;
-			bufferEnd = bufferPos + reader.Read(buffer, offset, buffer.Length - offset);
-			return bufferEnd != 0;
+			var read = reader.Read(buffer, offset, buffer.Length - offset);
+			bufferEnd = bufferPos + read;
+			return read != 0;
 		}
 
 		void ReadString(int quote)
 		{
 			Start = Location;
-			Read();
+			Read(); // consume the opening quote
 			while (true)
 			{
 				var c = Read();
 				if (c == -1)
-					throw new Exception();
+				{
+					HandleError(JsonErrorCode.UnterimatedString, Start);
+					return;
+				}
 				if (c == quote)
 				{
 					End = Location;
@@ -527,7 +572,21 @@ namespace Elemental.Json
 					case 't':
 						break;
 					case 'u':
-						throw new NotImplementedException();
+						for (int i = 0; i < 4; i++)
+						{
+							var d = Peek();
+
+							if (IsHexDigit(d))
+							{
+								Read();
+							}
+							else
+							{
+								HandleError(JsonErrorCode.UnexpectedCharacter);
+								break;
+							}
+						}
+						break;
 					}
 				}
 			}

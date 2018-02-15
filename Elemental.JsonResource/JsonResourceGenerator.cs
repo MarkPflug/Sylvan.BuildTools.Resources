@@ -93,8 +93,6 @@ namespace Elemental.JsonResource
 			}
 		}
 
-
-
 		// The method that is called to invoke our task.
 		public override bool Execute()
 		{
@@ -128,9 +126,16 @@ namespace Elemental.JsonResource
 				var json = new JsonReader(new StringReader(text), logger.JsonError);
 				var doc = JsonDocument.Load(json);
 
+				if(doc.RootNode == null)
+				{
+					logger.ParseError("Failed to parse json text.", doc);
+					continue;
+				}
+
 				if (doc.RootNode.NodeType != JsonNodeType.Object)
 				{
 					logger.ParseError("Expected object as root node.", doc.RootNode);
+					continue;
 				}
 
 				var root = (JsonObject) doc.RootNode;
@@ -145,7 +150,6 @@ namespace Elemental.JsonResource
 				var resourceName = resName + ".resources";
 
 				Directory.CreateDirectory(OutputPath);
-
 				
 				// write the generated C# code and resources file.
 				if (!hasCulture)

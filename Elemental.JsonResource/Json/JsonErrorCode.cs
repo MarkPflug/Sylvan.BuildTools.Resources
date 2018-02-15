@@ -5,9 +5,17 @@
 		Unknown = 0,
 		UnexpectedCharacter,
 		ExpectedStartObjectOrArray,
-		UnexpectedEndOfFile,
+		ExpectedEndOfText,
+		UnexpectedEndOfText,
 		MissingComma,
 		MissingColon,
 		TokenTooLong,
+		MultipleRootElements,
+		UnexpectedEndObject,
+		UnexpectedEndArray,
+		ExpectedObjectMember,
+		ExpectedColon,
+		UnexpectedToken,
+		UnterimatedString
 	}
 }

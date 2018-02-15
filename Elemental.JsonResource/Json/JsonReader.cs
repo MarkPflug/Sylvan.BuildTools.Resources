@@ -54,11 +54,11 @@ namespace Elemental.Json
 		{
 			Start = 1,
 			End,
-			ObjectStart,
+			//ObjectStart,
 			PropertyName,
 			ObjectColon,
 			ObjectValue,
-			ArrayStart,
+			//ArrayStart,
 			Comma,
 			Value,
 		}
@@ -83,21 +83,18 @@ namespace Elemental.Json
 			get { return tokenizer.End; }
 		}
 
-		void HandleError()
-		{
-			HandleError(default, default);
-		}
-
 		void HandleError(JsonErrorCode error, Location location)
 		{
-			if (!this.errorHandler(error, location)) {
+			if (!this.errorHandler(error, location))
+			{
 				throw new JsonParseException(error, location);
 			}
 		}
 
 		void HandleError(JsonErrorCode code)
 		{
-			if (!this.errorHandler(code, tokenizer.Location)) {
+			if (!this.errorHandler(code, tokenizer.Location))
+			{
 				throw new JsonParseException(code, tokenizer.Location);
 			}
 		}
@@ -136,7 +133,8 @@ namespace Elemental.Json
 		{
 			get
 			{
-				switch(this.tokenizer.TokenKind) {
+				switch (this.tokenizer.TokenKind)
+				{
 				case TokenKind.NumberFloat:
 					return tokenizer.GetFloat();
 				case TokenKind.NumberInteger:
@@ -151,7 +149,8 @@ namespace Elemental.Json
 		{
 			get
 			{
-				switch (this.tokenizer.TokenKind) {
+				switch (this.tokenizer.TokenKind)
+				{
 				case TokenKind.NumberInteger:
 					return tokenizer.GetInteger();
 				default:
@@ -164,7 +163,8 @@ namespace Elemental.Json
 		{
 			get
 			{
-				switch(this.tokenizer.TokenKind) {
+				switch (this.tokenizer.TokenKind)
+				{
 				case TokenKind.Name:
 					throw new NotImplementedException();
 				case TokenKind.String:
@@ -177,7 +177,8 @@ namespace Elemental.Json
 
 		public int WriteStringValue(TextWriter writer)
 		{
-			switch (this.tokenizer.TokenKind) {
+			switch (this.tokenizer.TokenKind)
+			{
 			case TokenKind.Name:
 				throw new NotImplementedException();
 			case TokenKind.String:
@@ -192,9 +193,10 @@ namespace Elemental.Json
 		{
 			get
 			{
-				if(SyntaxKind != SyntaxKind.PropertyName)
+				if (SyntaxKind != SyntaxKind.PropertyName)
 					throw new InvalidOperationException();
-				switch (this.tokenizer.TokenKind) {
+				switch (this.tokenizer.TokenKind)
+				{
 				case TokenKind.Name:
 				case TokenKind.String:
 					return tokenizer.GetString();
@@ -208,7 +210,8 @@ namespace Elemental.Json
 		{
 			if (SyntaxKind != SyntaxKind.PropertyName)
 				throw new InvalidOperationException();
-			switch (this.tokenizer.TokenKind) {
+			switch (this.tokenizer.TokenKind)
+			{
 			case TokenKind.Name:
 			case TokenKind.String:
 				return tokenizer.WriteString(writer);
@@ -221,9 +224,11 @@ namespace Elemental.Json
 		{
 			get
 			{
-				switch (this.tokenizer.TokenKind) {
+				switch (this.tokenizer.TokenKind)
+				{
 				case TokenKind.Name:
-					switch (this.SyntaxKind) {
+					switch (this.SyntaxKind)
+					{
 					case SyntaxKind.TrueValue:
 						return true;
 					case SyntaxKind.FalseValue:
@@ -239,16 +244,19 @@ namespace Elemental.Json
 		{
 			this.lastEnd = tokenizer.End;
 			start:
-			if (tokenizer.NextToken()) {
+			if (tokenizer.NextToken())
+			{
 				next:
 				var token = tokenizer.TokenKind;
 				// this will be assigned to something else before we return, 
 				// unless we exit with an error condition.
-				this.SyntaxKind = SyntaxKind.None; 
+				this.SyntaxKind = SyntaxKind.None;
 
-				if (token == TokenKind.EndOfText) {
-					if (nodeStack.Count > 0) {
-						HandleError(JsonErrorCode.UnexpectedEndOfFile);
+				if (token == TokenKind.None)
+				{
+					if (nodeStack.Count > 0)
+					{
+						HandleError(JsonErrorCode.UnexpectedEndOfText);
 						return false;
 					}
 					return false;
@@ -257,45 +265,47 @@ namespace Elemental.Json
 				if (token == TokenKind.BlockComment || token == TokenKind.LineComment)
 					goto start;
 
-				switch (state) {
+				switch (state)
+				{
 				case State.End:
-					switch (token) {
+					// never transition out of the end state.
+					// keep consuming tokens until we find none.
+					// anything but a comment is an error condition
+					switch (token)
+					{
+					case TokenKind.LineComment:
+					case TokenKind.BlockComment:
+						goto start;
 					case TokenKind.None:
 						return false;
+					case TokenKind.StartArray:
+					case TokenKind.EndArray:
+						HandleError(JsonErrorCode.MultipleRootElements);
+						return false;
 					default:
-						HandleError();
+						HandleError(JsonErrorCode.ExpectedEndOfText);
 						return false;
 					}
 				case State.Start:
-					switch (token) {
+					switch (token)
+					{
 					case TokenKind.StartArray:
 						Push(Context.Array);
-						state = State.ArrayStart;
+						state = State.Value;
 						this.SyntaxKind = SyntaxKind.ArrayStart;
 						return true;
 					case TokenKind.StartObject:
 						Push(Context.Object);
-						state = State.ObjectStart;
+						state = State.PropertyName;
 						this.SyntaxKind = SyntaxKind.ObjectStart;
 						return true;
 					default:
 						HandleError(JsonErrorCode.ExpectedStartObjectOrArray, tokenizer.Location);
 						goto start;
 					}
-				case State.ObjectStart:
-					if (token == TokenKind.EndObject) {
-						var context = Peek();
-						if (context == Context.Object) {
-							Pop();
-							this.SyntaxKind = SyntaxKind.ObjectEnd;
-							return true;
-						}
-						HandleError();
-						goto start;
-					}
-					goto case State.PropertyName;
 				case State.PropertyName:
-					switch (token) {
+					switch (token)
+					{
 					case TokenKind.String:
 					case TokenKind.Name:
 						this.SyntaxKind = SyntaxKind.PropertyName;
@@ -303,29 +313,35 @@ namespace Elemental.Json
 						return true;
 					case TokenKind.EndObject:
 						var context = Peek();
-						if (context == Context.Object) {
+						if (context == Context.Object)
+						{
 							Pop();
+							this.state = State.Comma;
 							this.SyntaxKind = SyntaxKind.ObjectEnd;
 							return true;
 						}
-						HandleError();
+						HandleError(JsonErrorCode.ExpectedObjectMember);
 						goto start;
 					default:
-						HandleError();
+						HandleError(JsonErrorCode.UnexpectedToken);
 						goto start;
 					}
 				case State.ObjectColon:
-					if (token == TokenKind.Colon) {
+					if (token == TokenKind.Colon)
+					{
 						state = State.Value;
 						goto start;
 					}
-					else {
-						HandleError();
-						goto start;
+					else
+					{
+						HandleError(JsonErrorCode.ExpectedColon, lastEnd);
+						state = State.Value;
+						goto next;
 					}
 				case State.Value:
 					state = State.Comma;
-					switch (token) {
+					switch (token)
+					{
 					case TokenKind.NumberInteger:
 						SyntaxKind = SyntaxKind.IntegerValue;
 						return true;
@@ -340,17 +356,18 @@ namespace Elemental.Json
 						return true;
 					case TokenKind.StartArray:
 						Push(Context.Array);
-						state = State.ArrayStart;
+						state = State.Value;
 						SyntaxKind = SyntaxKind.ArrayStart;
 						return true;
 					case TokenKind.StartObject:
 						Push(Context.Object);
-						state = State.ObjectStart;
+						state = State.PropertyName;
 						SyntaxKind = SyntaxKind.ObjectStart;
 						return true;
 					case TokenKind.EndArray:
 						var context = Peek();
-						if (context == Context.Array) {
+						if (context == Context.Array)
+						{
 							Pop();
 							context = Peek();
 							state = State.Comma;
@@ -359,25 +376,15 @@ namespace Elemental.Json
 						}
 						goto default;
 					default:
-						HandleError();
+						HandleError(JsonErrorCode.UnexpectedToken);
 						goto start;
 					}
-				case State.ArrayStart:
-					if (token == TokenKind.EndArray) {
-						var context = Peek();
-						if (context == Context.Array) {
-							Pop();
-							context = Peek();
-							state = State.Comma;
-							this.SyntaxKind = SyntaxKind.ArrayEnd;
-							return true;
-						}
-					}
-					goto case State.Value;
 				case State.Comma:
-					switch (token) {
+					switch (token)
+					{
 					case TokenKind.Comma:
-						switch (Peek()) {
+						switch (Peek())
+						{
 						case Context.Object:
 							state = State.PropertyName;
 							goto start;
@@ -385,32 +392,37 @@ namespace Elemental.Json
 							state = State.Value;
 							goto start;
 						default:
-							HandleError(JsonErrorCode.UnexpectedEndOfFile);
+							HandleError(JsonErrorCode.UnexpectedEndOfText);
 							goto start;
 						}
 					case TokenKind.EndArray:
-						if (Peek() == Context.Array) {
+						if (Peek() == Context.Array)
+						{
 							Pop();
 						}
-						else {
-							HandleError();
+						else
+						{
+							HandleError(JsonErrorCode.UnexpectedEndArray);
 							goto start;
 						}
 						this.SyntaxKind = SyntaxKind.ArrayEnd;
 						return true;
 					case TokenKind.EndObject:
-						if (Peek() == Context.Object) {
+						if (Peek() == Context.Object)
+						{
 							Pop();
 						}
-						else {
-							HandleError();
+						else
+						{
+							HandleError(JsonErrorCode.UnexpectedEndObject);
 							goto start;
 						}
 						this.SyntaxKind = SyntaxKind.ObjectEnd;
 						return true;
 					default:
 						HandleError(JsonErrorCode.MissingComma, lastEnd);
-						switch (Peek()) {
+						switch (Peek())
+						{
 						case Context.Array:
 							state = State.Value;
 							break;
@@ -423,8 +435,9 @@ namespace Elemental.Json
 				}
 			}
 
-			if (nodeStack.Count > 0) {
-				HandleError(JsonErrorCode.UnexpectedEndOfFile);
+			if (nodeStack.Count > 0)
+			{
+				HandleError(JsonErrorCode.UnexpectedEndOfText);
 			}
 			return false;
 		}
