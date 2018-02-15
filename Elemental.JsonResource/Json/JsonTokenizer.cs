@@ -56,6 +56,12 @@ namespace Elemental.Json
 				throw new JsonParseException(code, location);
 		}
 
+		void NewLine()
+		{
+			line++;
+			column = 1;
+		}
+
 		public Location Location
 		{
 			get
@@ -84,10 +90,12 @@ namespace Elemental.Json
 			End = default;
 			TokenKind = TokenKind.None;
 
-			while (true) {
+			while (true)
+			{
 				bufferTokenStart = bufferPos;
 				var c = Peek();
-				switch (c) {
+				switch (c)
+				{
 				case -1:
 					Start = End = Location;
 					TokenKind = TokenKind.EndOfText;
@@ -118,7 +126,8 @@ namespace Elemental.Json
 					var location = Location;
 					Read();
 					var n = Peek();
-					switch (n) {
+					switch (n)
+					{
 					case '/':
 						Read();
 						ReadLineComment();
@@ -132,30 +141,32 @@ namespace Elemental.Json
 					continue;
 				case '\r':
 					Read();
-					if (Peek() == '\n') {
+					if (Peek() == '\n')
+					{
 						Read();
 					}
-					line += 1;
-					column = 1;
+					NewLine();
 					break;
 				case '\n':
 					Read();
-					line += 1;
-					column = 1;
+					NewLine();
 					break;
 				default:
 
-					if (IsDigit((char) c) || c == '-') {
+					if (IsDigit((char) c) || c == '-')
+					{
 						ReadNumber();
 						return true;
 					}
 
-					if (char.IsWhiteSpace((char) c)) {
+					if (char.IsWhiteSpace((char) c))
+					{
 						Read();
 						continue;
 					}
 
-					if (IsNameStart(c)) {
+					if (IsNameStart(c))
+					{
 						ReadName();
 						return true;
 					}
@@ -191,12 +202,15 @@ namespace Elemental.Json
 		{
 			Start = Location;
 			Read();
-			while (true) {
+			while (true)
+			{
 				var c = Peek();
-				if (IsNamePart(c)) {
+				if (IsNamePart(c))
+				{
 					Read();
 				}
-				else {
+				else
+				{
 					break;
 				}
 			}
@@ -211,31 +225,36 @@ namespace Elemental.Json
 
 		void ReadLineComment()
 		{
-			while (true) {
+			while (true)
+			{
 				var c = Peek();
 				if (c == -1)
 					break;
-				if (c == '\r') {
+				if (c == '\r')
+				{
 					Read();
 					c = Peek();
 					if (c == '\n')
 						Read();
 					break;
 				}
-				if (IsLineEnd(c)) {
+				if (IsLineEnd(c))
+				{
 					Read();
 					break;
 				}
 				Read();
 			}
 			End = Location;
+			NewLine();
 			TokenKind = TokenKind.LineComment;
 		}
 
 		public long GetInteger()
 		{
 			long val = 0;
-			for (var i = bufferTokenStart; i < bufferPos; i++) {
+			for (var i = bufferTokenStart; i < bufferPos; i++)
+			{
 				val = val * 10 + buffer[i] - '0';
 			}
 			return val;
@@ -260,17 +279,21 @@ namespace Elemental.Json
 			char c = buffer[i];
 			int count = 0;
 			int q = -1;
-			if (c == '"' || c == '\'') {
+			if (c == '"' || c == '\'')
+			{
 				q = c;
 				i++;
 			}
-			while(i < bufferPos) {
+			while (i < bufferPos)
+			{
 				c = buffer[i++];
 				if (c == q)
 					break;
-				if (c == '\\') {
+				if (c == '\\')
+				{
 					var n = buffer[i++];
-					switch (n) {
+					switch (n)
+					{
 					case '\"':
 						writer.Write('\"');
 						break;
@@ -302,7 +325,8 @@ namespace Elemental.Json
 					}
 					count++;
 				}
-				else {
+				else
+				{
 					writer.Write((char) c);
 
 					count++;
@@ -315,7 +339,8 @@ namespace Elemental.Json
 		{
 			if (bufferPos - bufferTokenStart != str.Length)
 				return false;
-			for (int i = 0; i < str.Length; i++) {
+			for (int i = 0; i < str.Length; i++)
+			{
 				if (buffer[bufferTokenStart + i] != str[i])
 					return false;
 			}
@@ -333,21 +358,37 @@ namespace Elemental.Json
 			return SyntaxKind.StringValue;
 		}
 
-
-
 		void ReadBlockComment()
 		{
-			while (true) {
+			while (true)
+			{
 				var c = Peek();
-				if (c == -1) {
+				if (c == -1)
+				{
 					HandleError(JsonErrorCode.UnexpectedEndOfFile);
 					break;
 				}
 
-				if (c == '*') {
+				if (c == '\r')
+				{
+					Read();
+					if (Peek() == '\n')
+						Read();
+					NewLine();
+				}
+
+				if (c == '\n')
+				{
+					Read();
+					NewLine();
+				}
+
+				if (c == '*')
+				{
 					Read();
 					c = Peek();
-					if (c == '/') {
+					if (c == '/')
+					{
 						Read();
 						break;
 					}
@@ -361,12 +402,15 @@ namespace Elemental.Json
 
 		void ReadDigits()
 		{
-			while (true) {
+			while (true)
+			{
 				var c = Peek();
-				if (c >= '0' && c <= '9') {
+				if (c >= '0' && c <= '9')
+				{
 					Read();
 				}
-				else {
+				else
+				{
 					break;
 				}
 			}
@@ -384,16 +428,19 @@ namespace Elemental.Json
 			ReadDigits();
 
 			c = Peek();
-			if (c == '.') {
+			if (c == '.')
+			{
 				Read();
 				kind = TokenKind.NumberFloat;
 				ReadDigits();
 			}
-			if (c == 'e' || c == 'E') {
+			if (c == 'e' || c == 'E')
+			{
 				kind = TokenKind.NumberFloat;
 				Read();
 				c = Peek();
-				if (c == '-' || c == '+') {
+				if (c == '-' || c == '+')
+				{
 					Read();
 				}
 				ReadDigits();
@@ -406,7 +453,8 @@ namespace Elemental.Json
 		int GetNewBufferSize()
 		{
 			var curLen = this.buffer.Length;
-			if (curLen >= DefaultMaxTokenSize) {
+			if (curLen >= DefaultMaxTokenSize)
+			{
 				throw new JsonParseException(JsonErrorCode.TokenTooLong, this.Start);
 			}
 			var newLen = this.buffer.Length * 2;
@@ -417,14 +465,16 @@ namespace Elemental.Json
 		bool FillBuffer()
 		{
 			var offset = bufferPos - bufferTokenStart;
-			if (bufferTokenStart == 0) {
+			if (bufferTokenStart == 0)
+			{
 				// need a bigger buffer;
 				var newLen = GetNewBufferSize();
 				var buffer = new char[newLen];
 				Array.Copy(this.buffer, bufferTokenStart, buffer, 0, bufferEnd - bufferTokenStart);
 				this.buffer = buffer;
 			}
-			else {
+			else
+			{
 				Array.Copy(this.buffer, bufferTokenStart, this.buffer, 0, bufferEnd - bufferTokenStart);
 			}
 			this.bufferTokenStart = 0;
@@ -438,18 +488,35 @@ namespace Elemental.Json
 		{
 			Start = Location;
 			Read();
-			while (true) {
+			while (true)
+			{
 				var c = Read();
 				if (c == -1)
 					throw new Exception();
-				if (c == quote) {
+				if (c == quote)
+				{
 					End = Location;
 					TokenKind = TokenKind.String;
 					return;
 				}
-				if (c == '\\') {
+
+				if (c == '\r')
+				{
+					if (Peek() == '\n')
+						Read();
+					NewLine();
+				}
+
+				if (c == '\n')
+				{
+					NewLine();
+				}
+
+				if (c == '\\')
+				{
 					var n = Read();
-					switch (n) {
+					switch (n)
+					{
 					case '\"':
 					case '\\':
 					case '/':
@@ -468,8 +535,10 @@ namespace Elemental.Json
 
 		int Peek()
 		{
-			if (bufferPos >= bufferEnd) {
-				if (!FillBuffer()) {
+			if (bufferPos >= bufferEnd)
+			{
+				if (!FillBuffer())
+				{
 					return -1;
 				}
 			}
@@ -479,7 +548,8 @@ namespace Elemental.Json
 
 		bool Read(char c)
 		{
-			if (c == Peek()) {
+			if (c == Peek())
+			{
 				Read();
 				return true;
 			}
