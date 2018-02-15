@@ -209,12 +209,12 @@ namespace Elemental.JsonResource
 									}
 								} else
 								{
-									logger.ParseError("Expected Json object.", value);
+									//logger.ParseError("Expected Json object.", value);
 								}
 
 								break;
 							default:
-								logger.ParseError("Unexpected property.", value);
+								//logger.ParseError("Unexpected property.", value);
 								break;
 							}
 						}
@@ -297,7 +297,7 @@ namespace Elemental.JsonResource
 								var textFilePath = Path.Combine(fileDir, strVal.Value);
 								if (!File.Exists(textFilePath))
 								{
-									logger.ParseError("File not found.", json);
+									logger.ParseError("File not found.", str);
 								}
 
 								using (var iStream = File.OpenRead(textFilePath))
