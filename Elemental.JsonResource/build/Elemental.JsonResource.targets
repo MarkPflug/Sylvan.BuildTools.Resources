@@ -8,7 +8,7 @@
 	<ItemGroup>
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.xaml" />
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.ContentType.xaml" />
-		<AvailableItemname Include="JsonResource"/>
+    <AvailableItemName Include="JsonResource"/>
 	</ItemGroup>
 
 	<PropertyGroup>

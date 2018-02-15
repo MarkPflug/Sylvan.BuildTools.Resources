@@ -2,6 +2,8 @@
 {
 	public struct Location
 	{
+		public static Location Empty { get => default; }
+
 		public Location(int line, int column)
 		{
 			this.Line = line;

@@ -242,7 +242,9 @@ namespace Elemental.Json
 			if (tokenizer.NextToken()) {
 				next:
 				var token = tokenizer.TokenKind;
-				//this.SyntaxKind = token;
+				// this will be assigned to something else before we return, 
+				// unless we exit with an error condition.
+				this.SyntaxKind = SyntaxKind.None; 
 
 				if (token == TokenKind.EndOfText) {
 					if (nodeStack.Count > 0) {

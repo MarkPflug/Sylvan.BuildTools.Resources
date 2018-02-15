@@ -1,5 +1,6 @@
 ﻿{
   "Strings": {
-    "Message": "Hello, World"
+    // this is the greeting we will show.
+    "Message": "Hello, World",
   }
 }

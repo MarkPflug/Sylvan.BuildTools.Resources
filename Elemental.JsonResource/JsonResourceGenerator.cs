@@ -57,13 +57,6 @@ namespace Elemental.JsonResource
 		[Output]
 		public ITaskItem[] OutputResources { get; set; }
 
-		enum Section
-		{
-			None = 0,
-			Strings,
-			Files
-		}
-
 		bool hasError = false;
 
 		class FileErrorLogger
@@ -86,7 +79,17 @@ namespace Elemental.JsonResource
 
 			public void ParseError(string message, JsonReader reader)
 			{
-				task.Log.LogError(null, "JS0001", null, file, reader.Start.Line, reader.Start.Column, reader.End.Line, reader.End.Column, message, null);
+				ParseError(message, reader.Start, reader.End);
+			}
+
+			public void ParseError(string message, Location start, Location end)
+			{
+				task.Log.LogError(null, "JS0001", null, file, start.Line, start.Column, end.Line, end.Column, message, null);
+			}
+
+			public void ParseError(string message, JsonNode node)
+			{
+				ParseError(message, node.Start, node.End);
 			}
 		}
 
@@ -123,6 +126,14 @@ namespace Elemental.JsonResource
 				// load the Json from the file
 				var text = File.ReadAllText(filePath);
 				var json = new JsonReader(new StringReader(text), logger.JsonError);
+				var doc = JsonDocument.Load(json);
+
+				if (doc.RootNode.NodeType != JsonNodeType.Object)
+				{
+					logger.ParseError("Expected object as root node.", doc.RootNode);
+				}
+
+				var root = (JsonObject) doc.RootNode;
 
 				var resName = iFile.GetMetadata("ResourceName");
 
@@ -135,6 +146,7 @@ namespace Elemental.JsonResource
 
 				Directory.CreateDirectory(OutputPath);
 
+				
 				// write the generated C# code and resources file.
 				if (!hasCulture)
 				{
@@ -145,9 +157,6 @@ namespace Elemental.JsonResource
 					string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 					outCodeItems.Add(new TaskItem(codeFile));
 					Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
-
-
-
 
 					using (var oStream = new FileStream(codeFile, FileMode.Create))
 					using (var w = new StreamWriter(oStream))
@@ -178,103 +187,37 @@ namespace Elemental.JsonResource
 						w.WriteLine("resourceCulture = value;");
 						w.WriteLine("}");
 						w.WriteLine("}");
-
-						if (!json.Read() || json.SyntaxKind != SyntaxKind.ObjectStart)
-							Log.LogError(filePath, "Expected root object element.", json);
-
-						Section section = Section.None;
-
-						while (json.Read())
+						
+						foreach(var section in root.Keys)
 						{
+							var value = root[section];
+
 							switch (section)
 							{
-							case Section.None:
-								switch (json.SyntaxKind)
+							case "Strings":
+							case "Files":
+								if(value.NodeType == JsonNodeType.Object)
 								{
-								case SyntaxKind.PropertyName:
-									var name = json.PropertyName;
-									var ln = name.ToLower();
-
-									switch (ln)
+									var obj = (JsonObject) value;
+									foreach (var key in obj.Keys)
 									{
-									case "strings":
-										section = Section.Strings;
-										if (!json.Read())
-										{
-											logger.ParseError("Expected end of file.", json);
-											goto end;
-										}
-										if (json.SyntaxKind != SyntaxKind.ObjectStart)
-										{
-											logger.ParseError("Expected object start", json);
-											goto end;
-										}
-										break;
-									case "files":
-										section = Section.Files;
-										if (!json.Read())
-										{
-											logger.ParseError("Expected end of file.", json);
-											goto end;
-										}
-										if (json.SyntaxKind != SyntaxKind.ObjectStart)
-										{
-											logger.ParseError("Expected object start", json);
-											goto end;
-										}
-										break;
-									default:
-										logger.ParseError("Unexpected section " + name, json);
-										goto end;
-									}
-									break;
-								case SyntaxKind.ObjectEnd:
-									if (json.Read())
-									{
-										logger.ParseError("Expected end of file.", json);
-									}
-									break;
-								default:
-									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-									goto end;
-								}
-								break;
-							case Section.Strings:
-							case Section.Files:
-								switch (json.SyntaxKind)
-								{
-								case SyntaxKind.PropertyName:
-									var name = json.PropertyName;
-									if (!json.Read())
-									{
-										logger.ParseError("Unexpected end of file.", json);
-									}
-									if (json.SyntaxKind == SyntaxKind.StringValue)
-									{
-										w.WriteLine("public static string " + name + " {");
+										w.WriteLine("public static string " + key + " {");
 										w.WriteLine("get {");
-										w.WriteLine("return ResourceManager.GetString(\"" + name + "\", resourceCulture);");
+										w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
 										w.WriteLine("}");
 										w.WriteLine("}");
 									}
-									else
-									{
-										logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-										break;
-									}
-
-									break;
-								case SyntaxKind.ObjectEnd:
-									section = Section.None;
-									break;
-								default:
-									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-									break;
+								} else
+								{
+									logger.ParseError("Expected Json object.", value);
 								}
+
+								break;
+							default:
+								logger.ParseError("Unexpected property.", value);
 								break;
 							}
 						}
-						end:
 
 						w.WriteLine("}");
 
@@ -284,10 +227,7 @@ namespace Elemental.JsonResource
 						}
 					}
 				}
-
-
-
-
+				
 
 				// prepare the generated files we are about to write.
 				var resFile = Path.Combine(OutputPath, resourceName);
@@ -313,121 +253,68 @@ namespace Elemental.JsonResource
 				json = new JsonReader(new StringReader(text), logger.JsonError);
 				using (var rw = new System.Resources.ResourceWriter(resFile))
 				{
-					if (!json.Read() || json.SyntaxKind != SyntaxKind.ObjectStart)
-						Log.LogError(filePath, "Expected root object element.", json);
 
-					Section section = Section.None;
-
-					while (json.Read())
+					foreach (var section in root.Keys)
 					{
+						var sectionNode = root[section];
+						var isFile = false;
 						switch (section)
 						{
-						case Section.None:
-							switch (json.SyntaxKind)
-							{
-							case SyntaxKind.PropertyName:
-								var name = json.PropertyName;
-								var ln = name.ToLower();
-
-								switch (ln)
-								{
-								case "strings":
-									section = Section.Strings;
-									if (!json.Read())
-									{
-										logger.ParseError("Expected end of file.", json);
-										goto end;
-									}
-									if (json.SyntaxKind != SyntaxKind.ObjectStart)
-									{
-										logger.ParseError("Expected object start", json);
-										goto end;
-									}
-									break;
-								case "files":
-									section = Section.Files;
-									if (!json.Read())
-									{
-										logger.ParseError("Expected end of file.", json);
-										goto end;
-									}
-									if (json.SyntaxKind != SyntaxKind.ObjectStart)
-									{
-										logger.ParseError("Expected object start", json);
-										goto end;
-									}
-									break;
-								default:
-									logger.ParseError("Unexpected section " + name, json);
-									goto end;
-								}
-								break;
-							case SyntaxKind.ObjectEnd:
-								if (json.Read())
-								{
-									logger.ParseError("Expected end of file.", json);
-								}
-								break;
-							default:
-								logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-								goto end;
-							}
+						case "Strings":
+							isFile = false;
 							break;
-						case Section.Strings:
-						case Section.Files:
-							switch (json.SyntaxKind)
-							{
-							case SyntaxKind.PropertyName:
-								var name = json.PropertyName;
-								if (!json.Read())
-								{
-									logger.ParseError("Unexpected end of file.", json);
-								}
-								if (json.SyntaxKind == SyntaxKind.StringValue)
-								{
-									// loop over all the strings in our resj file.
-									if (section == Section.Strings)
-									{
-										// write our string to the resources binary
-										rw.AddResource(name, json.StringValue);
-									}
-									else
-									if (section == Section.Files)
-									{
-
-										var textFilePath = Path.Combine(fileDir, name);
-										if (!File.Exists(textFilePath))
-										{
-											logger.ParseError("File not found.", json);
-										}
-
-										using (var iStream = File.OpenRead(textFilePath))
-										using (var reader = new StreamReader(iStream))
-										{
-											var txt = reader.ReadToEnd();
-											// write our string to the resources binary
-											rw.AddResource(name, txt);
-										}
-									}
-								}
-								else
-								{
-									logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-									break;
-								}
-
-								break;
-							case SyntaxKind.ObjectEnd:
-								section = Section.None;
-								break;
-							default:
-								logger.ParseError("Unexpected syntax " + json.SyntaxKind.ToString(), json);
-								break;
-							}
+						case "Files":
+							isFile = true;
 							break;
+						default:
+							logger.ParseError("Unexpected section.", sectionNode);
+							continue;
+						}						
+
+						if (sectionNode.NodeType != JsonNodeType.Object)
+						{
+							logger.ParseError("Expected json object", sectionNode);
+							continue;
 						}
+						var sectionObj = (JsonObject) sectionNode;
+
+							
+						foreach (var key in sectionObj.Keys)
+						{
+							var str = sectionObj[key];
+
+							if(str.NodeType != JsonNodeType.String)
+							{
+								logger.ParseError("Expected string value", str);
+								continue;
+							}
+
+							var strVal = (JsonString) str;
+
+							string txt;
+							if (isFile)
+							{
+								var textFilePath = Path.Combine(fileDir, strVal.Value);
+								if (!File.Exists(textFilePath))
+								{
+									logger.ParseError("File not found.", json);
+								}
+
+								using (var iStream = File.OpenRead(textFilePath))
+								using (var reader = new StreamReader(iStream))
+								{
+									txt = reader.ReadToEnd();
+								}
+							} else
+							{
+								txt = strVal.Value;
+							}
+
+							// write our string to the resources binary
+							rw.AddResource(key, txt);
+						}
+						
 					}
-					end:;
 				}
 			}
 
