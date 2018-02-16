@@ -301,13 +301,21 @@ namespace Elemental.JsonResource
 								var textFilePath = Path.Combine(fileDir, strVal.Value);
 								if (!File.Exists(textFilePath))
 								{
-									logger.ParseError("File not found.", str);
+									logger.ParseError("Resource file '" + strVal.Value + "' not found.", str);
+									continue;
 								}
-
-								using (var iStream = File.OpenRead(textFilePath))
-								using (var reader = new StreamReader(iStream))
+								try
 								{
-									txt = reader.ReadToEnd();
+									using (var iStream = File.OpenRead(textFilePath))
+									using (var reader = new StreamReader(iStream))
+									{
+										txt = reader.ReadToEnd();
+									}
+								}
+								catch (Exception e)
+								{
+									logger.ParseError(e.Message, str);
+									continue;
 								}
 							} else
 							{
@@ -316,8 +324,7 @@ namespace Elemental.JsonResource
 
 							// write our string to the resources binary
 							rw.AddResource(key, txt);
-						}
-						
+						}						
 					}
 				}
 			}
