@@ -28,7 +28,9 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
-    <PackageReference Include="MSBuildGitHash" Version="0.2.0" />
+    <PackageReference Include="MSBuildGitHash" Version="0.2.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 	
   <ItemGroup>
