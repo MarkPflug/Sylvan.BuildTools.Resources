@@ -12,4 +12,9 @@
     </Rule.DataSource>
     <StringProperty Name="Namespace" DisplayName="Namespace" />
     <StringProperty Name="ResourceName" DisplayName="Resource Name" />
+    <EnumProperty Name="AccessModifier" DisplayName="Access Modifier">
+        <EnumValue Name="Public" DisplayName="Public"/>
+        <EnumValue Name="Internal" DisplayName="Internal"/>
+        <EnumValue Name="NoCodeGen" DisplayName="No Code Generation"/>
+    </EnumProperty>
 </Rule>

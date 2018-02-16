@@ -1,11 +1,11 @@
-﻿using Elemental.Json;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Elemental.Json;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace Elemental.JsonResource
 {
@@ -38,7 +38,6 @@ namespace Elemental.JsonResource
 #endif
 		}
 	}
-
 
 	public class JsonResourceGenerator : Task
 	{
@@ -93,6 +92,10 @@ namespace Elemental.JsonResource
 			}
 		}
 
+		const string AccessPublic = "Public";
+		const string AccessInternal = "Internal";
+		const string AccessNoCodeGen = "NoCodeGen";
+
 		// The method that is called to invoke our task.
 		public override bool Execute()
 		{
@@ -126,7 +129,7 @@ namespace Elemental.JsonResource
 				var json = new JsonReader(new StringReader(text), logger.JsonError);
 				var doc = JsonDocument.Load(json);
 
-				if(doc.RootNode == null)
+				if (doc.RootNode == null)
 				{
 					logger.ParseError("Failed to parse json text.", doc);
 					continue;
@@ -150,88 +153,100 @@ namespace Elemental.JsonResource
 				var resourceName = resName + ".resources";
 
 				Directory.CreateDirectory(OutputPath);
-				
+
 				// write the generated C# code and resources file.
 				if (!hasCulture)
 				{
 					var codeFile = Path.Combine(OutputPath, iFile.ItemSpec + ".g.cs");
+					var access = iFile.GetMetadata("AccessModifier");
 
-					var ns = iFile.GetMetadata("Namespace");
+					var noCodeGen = StringComparer.OrdinalIgnoreCase.Equals(access, AccessNoCodeGen);
 
-					string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
-					outCodeItems.Add(new TaskItem(codeFile));
-					Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
-
-					using (var oStream = new FileStream(codeFile, FileMode.Create))
-					using (var w = new StreamWriter(oStream))
+					if (!noCodeGen)
 					{
-						if (!string.IsNullOrEmpty(ns))
-						{
-							w.WriteLine("namespace " + ns + " {");
-						}
 
-						w.WriteLine("using global::System.Reflection;");
-						// very simplistic resource accessor class mostly duplicated from resx output.
-						w.WriteLine("public static partial class " + className + " { ");
-						w.WriteLine("static global::System.Resources.ResourceManager rm;");
-						w.WriteLine("static global::System.Globalization.CultureInfo resourceCulture;");
-						w.WriteLine("static global::System.Resources.ResourceManager ResourceManager {");
-						w.WriteLine("get {");
-						w.WriteLine("if(object.ReferenceEquals(rm, null)) {");
-						w.WriteLine("rm = new global::System.Resources.ResourceManager(\"" + resName + "\", typeof(" + className + ").GetTypeInfo().Assembly);");
-						w.WriteLine("}");
-						w.WriteLine("return rm;");
-						w.WriteLine("}");
-						w.WriteLine("}");
-						w.WriteLine("static global::System.Globalization.CultureInfo Culture {");
-						w.WriteLine("get {");
-						w.WriteLine("return resourceCulture;");
-						w.WriteLine("}");
-						w.WriteLine("set {");
-						w.WriteLine("resourceCulture = value;");
-						w.WriteLine("}");
-						w.WriteLine("}");
-						
-						foreach(var section in root.Keys)
-						{
-							var value = root[section];
+						var isInternal = StringComparer.OrdinalIgnoreCase.Equals(access, AccessInternal);
 
-							switch (section)
+						var ns = iFile.GetMetadata("Namespace");
+
+						string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
+						outCodeItems.Add(new TaskItem(codeFile));
+						Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
+
+						using (var oStream = new FileStream(codeFile, FileMode.Create))
+						using (var w = new StreamWriter(oStream))
+						{
+							if (!string.IsNullOrEmpty(ns))
 							{
-							case "Strings":
-							case "Files":
-								if(value.NodeType == JsonNodeType.Object)
-								{
-									var obj = (JsonObject) value;
-									foreach (var key in obj.Keys)
-									{
-										w.WriteLine("public static string " + key + " {");
-										w.WriteLine("get {");
-										w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-										w.WriteLine("}");
-										w.WriteLine("}");
-									}
-								} else
-								{
-									//logger.ParseError("Expected Json object.", value);
-								}
-
-								break;
-							default:
-								//logger.ParseError("Unexpected property.", value);
-								break;
+								w.WriteLine("namespace " + ns + " {");
 							}
-						}
 
-						w.WriteLine("}");
-
-						if (!string.IsNullOrEmpty(ns))
-						{
+							w.WriteLine("using global::System.Reflection;");
+							// very simplistic resource accessor class mostly duplicated from resx output.
+							if (!isInternal)
+								w.Write("public ");
+							w.WriteLine("static partial class " + className + " { ");
+							w.WriteLine("static global::System.Resources.ResourceManager rm;");
+							w.WriteLine("static global::System.Globalization.CultureInfo resourceCulture;");
+							w.WriteLine("static global::System.Resources.ResourceManager ResourceManager {");
+							w.WriteLine("get {");
+							w.WriteLine("if(object.ReferenceEquals(rm, null)) {");
+							w.WriteLine("rm = new global::System.Resources.ResourceManager(\"" + resName + "\", typeof(" + className + ").GetTypeInfo().Assembly);");
 							w.WriteLine("}");
+							w.WriteLine("return rm;");
+							w.WriteLine("}");
+							w.WriteLine("}");
+							w.WriteLine("static global::System.Globalization.CultureInfo Culture {");
+							w.WriteLine("get {");
+							w.WriteLine("return resourceCulture;");
+							w.WriteLine("}");
+							w.WriteLine("set {");
+							w.WriteLine("resourceCulture = value;");
+							w.WriteLine("}");
+							w.WriteLine("}");
+
+							foreach (var section in root.Keys)
+							{
+								var value = root[section];
+
+								switch (section)
+								{
+								case "Strings":
+								case "Files":
+									if (value.NodeType == JsonNodeType.Object)
+									{
+										var obj = (JsonObject) value;
+										foreach (var key in obj.Keys)
+										{
+											w.WriteLine("public static string " + key + " {");
+											w.WriteLine("get {");
+											w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+											w.WriteLine("}");
+											w.WriteLine("}");
+										}
+									}
+									else
+									{
+										//logger.ParseError("Expected Json object.", value);
+									}
+
+									break;
+								default:
+									//logger.ParseError("Unexpected property.", value);
+									break;
+								}
+							}
+
+							w.WriteLine("}");
+
+							if (!string.IsNullOrEmpty(ns))
+							{
+								w.WriteLine("}");
+							}
 						}
 					}
 				}
-				
+
 
 				// prepare the generated files we are about to write.
 				var resFile = Path.Combine(OutputPath, resourceName);
@@ -273,7 +288,7 @@ namespace Elemental.JsonResource
 						default:
 							logger.ParseError("Unexpected section.", sectionNode);
 							continue;
-						}						
+						}
 
 						if (sectionNode.NodeType != JsonNodeType.Object)
 						{
@@ -282,12 +297,12 @@ namespace Elemental.JsonResource
 						}
 						var sectionObj = (JsonObject) sectionNode;
 
-							
+
 						foreach (var key in sectionObj.Keys)
 						{
 							var str = sectionObj[key];
 
-							if(str.NodeType != JsonNodeType.String)
+							if (str.NodeType != JsonNodeType.String)
 							{
 								logger.ParseError("Expected string value", str);
 								continue;
@@ -317,14 +332,15 @@ namespace Elemental.JsonResource
 									logger.ParseError(e.Message, str);
 									continue;
 								}
-							} else
+							}
+							else
 							{
 								txt = strVal.Value;
 							}
 
 							// write our string to the resources binary
 							rw.AddResource(key, txt);
-						}						
+						}
 					}
 				}
 			}
