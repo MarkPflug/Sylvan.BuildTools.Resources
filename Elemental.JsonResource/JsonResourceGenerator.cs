@@ -164,8 +164,7 @@ namespace Elemental.JsonResource
 
 					if (!noCodeGen)
 					{
-
-						var isInternal = StringComparer.OrdinalIgnoreCase.Equals(access, AccessInternal);
+						var isPublic = StringComparer.OrdinalIgnoreCase.Equals(access, AccessPublic);
 
 						var ns = iFile.GetMetadata("Namespace");
 
@@ -181,9 +180,10 @@ namespace Elemental.JsonResource
 								w.WriteLine("namespace " + ns + " {");
 							}
 
-							w.WriteLine("using global::System.Reflection;");
+
 							// very simplistic resource accessor class mostly duplicated from resx output.
-							if (!isInternal)
+							w.WriteLine("using global::System.Reflection;");
+							if (isPublic)
 								w.Write("public ");
 							w.WriteLine("static partial class " + className + " { ");
 							w.WriteLine("static global::System.Resources.ResourceManager rm;");
