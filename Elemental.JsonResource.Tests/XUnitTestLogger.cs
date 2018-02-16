@@ -25,6 +25,12 @@ namespace Elemental.JsonResource
 			eventSource.BuildStarted += EventSource_BuildStarted;
 			eventSource.ProjectStarted += EventSource_ProjectStarted;
 			eventSource.MessageRaised += EventSource_MessageRaised;
+			eventSource.ErrorRaised += EventSource_ErrorRaised;
+		}
+
+		private void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
+		{
+			o.WriteLine(e.Message + " " + e.File + "(" + e.LineNumber + "," + e.ColumnNumber + ")");
 		}
 
 		private void EventSource_MessageRaised(object sender, BuildMessageEventArgs e)
@@ -34,7 +40,6 @@ namespace Elemental.JsonResource
 				o.WriteLine(e.Message);
 			}
 		}
-
 
 		private void EventSource_ProjectStarted(object sender, ProjectStartedEventArgs e)
 		{

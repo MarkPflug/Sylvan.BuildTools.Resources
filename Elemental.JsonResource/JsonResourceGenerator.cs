@@ -1,6 +1,6 @@
-﻿using Microsoft.Build.Framework;
+﻿using Elemental.Json;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -57,6 +57,42 @@ namespace Elemental.JsonResource
 		[Output]
 		public ITaskItem[] OutputResources { get; set; }
 
+		bool hasError = false;
+
+		class FileErrorLogger
+		{
+			JsonResourceGenerator task;
+			string file;
+
+			public FileErrorLogger(JsonResourceGenerator task, string file)
+			{
+				this.task = task;
+				this.file = file;
+			}
+
+			public bool JsonError(JsonErrorCode error, Location loc)
+			{
+				task.hasError = true;
+				task.Log.LogError(null, "JP" + ((int) error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
+				return true;
+			}
+
+			public void ParseError(string message, JsonReader reader)
+			{
+				ParseError(message, reader.Start, reader.End);
+			}
+
+			public void ParseError(string message, Location start, Location end)
+			{
+				task.Log.LogError(null, "JS0001", null, file, start.Line, start.Column, end.Line, end.Column, message, null);
+			}
+
+			public void ParseError(string message, JsonNode node)
+			{
+				ParseError(message, node.Start, node.End);
+			}
+		}
+
 		// The method that is called to invoke our task.
 		public override bool Execute()
 		{
@@ -81,23 +117,32 @@ namespace Elemental.JsonResource
 				}
 
 				var fileDir = Path.GetDirectoryName(iFile.ItemSpec);
+				var filePath = iFile.ItemSpec;
 
-				JObject obj = null;
-				try
+				var logger = new FileErrorLogger(this, filePath);
+
+				// load the Json from the file
+				var text = File.ReadAllText(filePath);
+				var json = new JsonReader(new StringReader(text), logger.JsonError);
+				var doc = JsonDocument.Load(json);
+
+				if(doc.RootNode == null)
 				{
-					// load the Json from the file
-					var text = File.ReadAllText(iFile.ItemSpec);
-					obj = JObject.Parse(text);
+					logger.ParseError("Failed to parse json text.", doc);
+					continue;
 				}
-				catch (Exception)
+
+				if (doc.RootNode.NodeType != JsonNodeType.Object)
 				{
-					Log.LogError(null, null, null, iFile.ItemSpec, 0, 0, 0, 0, "Failed to load json resource file");
-					obj = null;
+					logger.ParseError("Expected object as root node.", doc.RootNode);
+					continue;
 				}
+
+				var root = (JsonObject) doc.RootNode;
 
 				var resName = iFile.GetMetadata("ResourceName");
 
-				if(string.IsNullOrEmpty(resName))
+				if (string.IsNullOrEmpty(resName))
 				{
 					resName = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 				}
@@ -105,7 +150,7 @@ namespace Elemental.JsonResource
 				var resourceName = resName + ".resources";
 
 				Directory.CreateDirectory(OutputPath);
-
+				
 				// write the generated C# code and resources file.
 				if (!hasCulture)
 				{
@@ -116,6 +161,7 @@ namespace Elemental.JsonResource
 					string className = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 					outCodeItems.Add(new TaskItem(codeFile));
 					Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
+
 					using (var oStream = new FileStream(codeFile, FileMode.Create))
 					using (var w = new StreamWriter(oStream))
 					{
@@ -145,42 +191,38 @@ namespace Elemental.JsonResource
 						w.WriteLine("resourceCulture = value;");
 						w.WriteLine("}");
 						w.WriteLine("}");
-
-						if (obj != null)
+						
+						foreach(var section in root.Keys)
 						{
-							// loop over all the strings in our resj file.
-							foreach (var kvp in (JObject)obj["Strings"])
-							{
-								var key = kvp.Key;
-								var value = (JValue)kvp.Value;
+							var value = root[section];
 
-								// generate a C# property to access the string by name.
-								w.WriteLine("public static string " + key + " {");
-								w.WriteLine("get {");
-								w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-								w.WriteLine("}");
-								w.WriteLine("}");
-							}
-
-							var textFiles = (JObject)obj["TextFiles"];
-							// loop over all the strings in our resj file.
-							if (textFiles != null)
+							switch (section)
 							{
-								foreach (var kvp in textFiles)
+							case "Strings":
+							case "Files":
+								if(value.NodeType == JsonNodeType.Object)
 								{
-									var key = kvp.Key;
-									var fileName = (string)((JValue)kvp.Value).Value;
-									Path.Combine(fileDir, fileName);
-
-									// generate a C# property to access the string by name.
-									w.WriteLine("public static string " + key + " {");
-									w.WriteLine("get {");
-									w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-									w.WriteLine("}");
-									w.WriteLine("}");
+									var obj = (JsonObject) value;
+									foreach (var key in obj.Keys)
+									{
+										w.WriteLine("public static string " + key + " {");
+										w.WriteLine("get {");
+										w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+										w.WriteLine("}");
+										w.WriteLine("}");
+									}
+								} else
+								{
+									//logger.ParseError("Expected Json object.", value);
 								}
+
+								break;
+							default:
+								//logger.ParseError("Unexpected property.", value);
+								break;
 							}
 						}
+
 						w.WriteLine("}");
 
 						if (!string.IsNullOrEmpty(ns))
@@ -189,7 +231,7 @@ namespace Elemental.JsonResource
 						}
 					}
 				}
-
+				
 
 				// prepare the generated files we are about to write.
 				var resFile = Path.Combine(OutputPath, resourceName);
@@ -201,6 +243,8 @@ namespace Elemental.JsonResource
 
 				resItem.SetMetadata("WithCulture", hasCulture ? "true" : "false");
 				resItem.SetMetadata("Type", "Non-Resx");
+
+				outResItems.Add(resItem);
 				if (hasCulture)
 				{
 					resItem.SetMetadata("Culture", culturePart);
@@ -210,56 +254,86 @@ namespace Elemental.JsonResource
 
 				}
 
+				json = new JsonReader(new StringReader(text), logger.JsonError);
 				using (var rw = new System.Resources.ResourceWriter(resFile))
 				{
-					if (obj != null)
+
+					foreach (var section in root.Keys)
 					{
-						// loop over all the strings in our resj file.
-						foreach (var kvp in (JObject)obj["Strings"])
+						var sectionNode = root[section];
+						var isFile = false;
+						switch (section)
 						{
-							var key = kvp.Key;
-							var value = (JValue)kvp.Value;
+						case "Strings":
+							isFile = false;
+							break;
+						case "Files":
+							isFile = true;
+							break;
+						default:
+							logger.ParseError("Unexpected section.", sectionNode);
+							continue;
+						}						
+
+						if (sectionNode.NodeType != JsonNodeType.Object)
+						{
+							logger.ParseError("Expected json object", sectionNode);
+							continue;
+						}
+						var sectionObj = (JsonObject) sectionNode;
+
+							
+						foreach (var key in sectionObj.Keys)
+						{
+							var str = sectionObj[key];
+
+							if(str.NodeType != JsonNodeType.String)
+							{
+								logger.ParseError("Expected string value", str);
+								continue;
+							}
+
+							var strVal = (JsonString) str;
+
+							string txt;
+							if (isFile)
+							{
+								var textFilePath = Path.Combine(fileDir, strVal.Value);
+								if (!File.Exists(textFilePath))
+								{
+									logger.ParseError("Resource file '" + strVal.Value + "' not found.", str);
+									continue;
+								}
+								try
+								{
+									using (var iStream = File.OpenRead(textFilePath))
+									using (var reader = new StreamReader(iStream))
+									{
+										txt = reader.ReadToEnd();
+									}
+								}
+								catch (Exception e)
+								{
+									logger.ParseError(e.Message, str);
+									continue;
+								}
+							} else
+							{
+								txt = strVal.Value;
+							}
 
 							// write our string to the resources binary
-							rw.AddResource(key, (string)value.Value);
-						}
-
-						var textFiles = (JObject)obj["TextFiles"];
-						// loop over all the strings in our resj file.
-						if (textFiles != null)
-						{
-							foreach (var kvp in textFiles)
-							{
-								var key = kvp.Key;
-								var fileName = (string)((JValue)kvp.Value).Value;
-								Path.Combine(fileDir, fileName);
-								if (!File.Exists(fileName))
-								{
-									Log.LogError("Resource file not found: " + fileName);
-								}
-
-								using (var iStream = File.OpenRead(fileName))
-								using (var reader = new StreamReader(iStream))
-								{
-									var txt = reader.ReadToEnd();
-									// write our string to the resources binary
-									rw.AddResource(key, txt);
-								}
-							}
-						}
+							rw.AddResource(key, txt);
+						}						
 					}
-
-					if (hasCulture)
-					{
-
-					}
-					outResItems.Add(resItem);
 				}
 			}
+
 			// put the artifacts we created in the output properties.
 			OutputCode = outCodeItems.ToArray();
 			OutputResources = outResItems.ToArray();
-			return true;
+			return !hasError;
 		}
 	}
 }
+
