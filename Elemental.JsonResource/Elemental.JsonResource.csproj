@@ -1,56 +1,57 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
-		<VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.0</VersionPrefix>
 
-		<PackageProjectUrl>https://github.com/MarkPflug/Elemental.JsonResource</PackageProjectUrl>
-		<PackageIconUrl>https://markpflug.github.io/MarkPflug.png</PackageIconUrl>
-		<Authors>Mark Pflug</Authors>
-		<Description>Json Resource File</Description>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
-		<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<PackageTags>resj resource json</PackageTags>
+    <PackageProjectUrl>https://github.com/MarkPflug/Elemental.JsonResource</PackageProjectUrl>
+    <PackageIconUrl>https://markpflug.github.io/MarkPflug.png</PackageIconUrl>
+    <Authors>Mark Pflug</Authors>
+    <Title>Elemental Json Resource</Title>
+    <Summary>Elemental Json Resource provides a Json based alternative to resx resource files.</Summary>
+    <Description>Json Resource File</Description>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Copyright>Copyright © Mark Pflug 2018</Copyright>
+    <PackageTags>resj resource json</PackageTags>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
-	
-	<ItemGroup>
-		<Content Include="build\*" PackagePath="build\">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-	
+
   <ItemGroup>
-		<PackageReference Include="Microsoft.Build.Framework" Version="15.5.180">
-			<PrivateAssets>All</PrivateAssets>
-		</PackageReference>
+    <Content Include="build\*" PackagePath="build\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
-			<PrivateAssets>All</PrivateAssets>
-		</PackageReference>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="MSBuildGitHash" Version="0.2.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-	
+
   <ItemGroup>
     <Folder Include="Json\" />
   </ItemGroup>
 
-	<Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
-		<!--
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <!--
 		https://github.com/NuGet/Home/issues/5063
     The include needs to happen after output has been copied to build output folder
     but before NuGet generates a nuspec.
     -->
-		<ItemGroup>
-			<_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll">
-				<PackagePath>build\%(RecursiveDir)</PackagePath>
-				<Visible>false</Visible>
-				<BuildAction>Content</BuildAction>
-			</_PackageFiles>
-		</ItemGroup>
-	</Target>
+    <ItemGroup>
+      <_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll">
+        <PackagePath>build\%(RecursiveDir)</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
 
 </Project>
-  
