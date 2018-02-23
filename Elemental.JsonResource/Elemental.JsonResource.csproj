@@ -41,19 +41,4 @@
     <Folder Include="Json\" />
   </ItemGroup>
 
-  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
-    <!--
-		https://github.com/NuGet/Home/issues/5063
-    The include needs to happen after output has been copied to build output folder
-    but before NuGet generates a nuspec.
-    -->
-    <ItemGroup>
-      <_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll">
-        <PackagePath>build\%(RecursiveDir)</PackagePath>
-        <Visible>false</Visible>
-        <BuildAction>Content</BuildAction>
-      </_PackageFiles>
-    </ItemGroup>
-  </Target>
-
 </Project>
