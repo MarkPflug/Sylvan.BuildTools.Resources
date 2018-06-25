@@ -535,7 +535,7 @@ namespace Elemental.Json
 				var c = Read();
 				if (c == -1)
 				{
-					HandleError(JsonErrorCode.UnterimatedString, Start);
+					HandleError(JsonErrorCode.UnterminatedString, Start);
 					return;
 				}
 				if (c == quote)

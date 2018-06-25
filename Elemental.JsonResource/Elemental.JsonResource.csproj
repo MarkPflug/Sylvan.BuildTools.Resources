@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <VersionPrefix>0.1.0</VersionPrefix>
 
     <PackageProjectUrl>https://github.com/MarkPflug/Elemental.JsonResource</PackageProjectUrl>
@@ -14,7 +14,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Copyright>Copyright © Mark Pflug 2018</Copyright>
     <PackageTags>resj resource json</PackageTags>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>latest</LangVersion>
     <RepositoryUrl>https://github.com/MarkPflug/Elemental.JsonResource</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
