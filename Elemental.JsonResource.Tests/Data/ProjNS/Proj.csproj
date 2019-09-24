@@ -1,21 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net461</TargetFramework>
-		<CodeGenTestRoot>../../../../../../Elemental.JsonResource/bin/Debug/net461/Build/</CodeGenTestRoot>
-		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
-		<OutputType>Exe</OutputType>
-		<StartupObject></StartupObject>
 		<RootNamespace>TestNS</RootNamespace>
 	</PropertyGroup>
-
-	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.props"/>
 
 	<ItemGroup>
 		<JsonResource Update="My Resources\Custom.resj">
 			<Namespace>CustomNS</Namespace>
 		</JsonResource>
 	</ItemGroup>
-
-
-	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.targets"/>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Locator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,25 @@ using Xunit.Abstractions;
 
 namespace Elemental.JsonResource
 {
+	class MsBuildFixture : IDisposable
+	{
+		public MsBuildFixture()
+		{
+			MSBuildLocator.RegisterDefaults();
+		}
+
+		public void Dispose()
+		{
+			MSBuildLocator.Unregister();
+		}
+	}
+
+	[CollectionDefinition("MSBuild")]
+	public class MSBuildCollection : ICollectionFixture<MsBuildFixture>
+	{
+	}
+
+	[Collection("MSBuild")]
 	public class JsonResourceGeneratorTests
 	{
 		ILogger logger;

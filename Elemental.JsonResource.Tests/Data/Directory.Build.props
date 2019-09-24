@@ -1,0 +1,9 @@
+﻿<Project>
+  <PropertyGroup>
+		<CodeGenTestRoot>../../../../../Elemental.JsonResource/bin/Debug/netstandard1.6/Build/</CodeGenTestRoot>
+		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.props"/>
+</Project>

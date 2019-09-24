@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net461</TargetFramework>
-		<CodeGenTestRoot>../../../../../../Elemental.JsonResource/bin/Debug/net461/Build/</CodeGenTestRoot>
-		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
-		<OutputType>Exe</OutputType>
 	</PropertyGroup>
-
-	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.props"/>
-	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.targets"/>
 </Project>

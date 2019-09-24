@@ -1,11 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<CodeGenTestRoot>../../../../../../Elemental.JsonResource/bin/Debug/netstandard1.6/Build/</CodeGenTestRoot>
-		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
-		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp3.0</TargetFramework>
 	</PropertyGroup>
 
-  <Import Project="$(CodeGenTestRoot)Elemental.JsonResource.props"/>
-	<Import Project="$(CodeGenTestRoot)Elemental.JsonResource.targets"/>
 </Project>

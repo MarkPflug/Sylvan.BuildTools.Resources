@@ -12,7 +12,7 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <Copyright>Copyright © Mark Pflug 2018</Copyright>
+    <Copyright>Copyright © Mark Pflug $([System.DateTime]::UtcNow.Year)</Copyright>
     <PackageTags>resj resource json</PackageTags>
     <LangVersion>latest</LangVersion>
     <RepositoryUrl>https://github.com/MarkPflug/Elemental.JsonResource</RepositoryUrl>
@@ -32,7 +32,7 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MSBuildGitHash" Version="0.2.0">
+    <PackageReference Include="MSBuildGitHash" Version="0.5.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
