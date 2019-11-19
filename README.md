@@ -22,6 +22,9 @@ Example files:
   "Strings": {
     "Greeting": "Hello, Resj",
     "Farewell": "Goodbye, Resx"
+  },
+  "Files": {
+    "ComplexQuery": "sql/query.sql"
   }
 }
 ```
