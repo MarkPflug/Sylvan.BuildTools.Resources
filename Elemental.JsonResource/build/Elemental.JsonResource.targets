@@ -8,7 +8,7 @@
 	<ItemGroup>
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.xaml" />
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Elemental.JsonResource.ContentType.xaml" />
-    <AvailableItemName Include="JsonResource"/>
+		<AvailableItemName Include="JsonResource"/>
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -16,12 +16,12 @@
 		<CoreCompileDependsOn>
 			GenerateJsonResource;
 			$(CoreCompileDependsOn)
-		</CoreCompileDependsOn>		
-		
+		</CoreCompileDependsOn>
+
 	</PropertyGroup>
-	
-	<Target 
-		Name="GenerateJsonResource" 
+
+	<Target
+		Name="GenerateJsonResource"
 		BeforeTargets="BeforeBuild"
 		Condition="'@(JsonResource)' != ''"
 	>
@@ -35,11 +35,11 @@
 			<JsonResource Remove="@(JsonResource)"/>
 		</ItemGroup>
 
-		<DetermineNamespace 
+		<DetermineNamespace
 			Items="@(JsonResourceTemp)"
 			NamespaceRoot="$(RootNamespace)">
 			<Output TaskParameter="Output"
-							ItemName="JsonResource"/>
+				ItemName="JsonResource"/>
 		</DetermineNamespace>
 
 		<JsonResourceGenerator
@@ -54,7 +54,5 @@
 			<Compile Include="@(ResourceCodeFile)"/>
 			<EmbeddedResource Include="@(ResourceResFile)"/>
 		</ItemGroup>
-		
 	</Target>
-
 </Project>

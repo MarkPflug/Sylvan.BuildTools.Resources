@@ -3,8 +3,7 @@
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
-		<JsonResourceTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Full' And '$(JsonResourceTaskAssembly)' == ''">netstandard1.6\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
-		<JsonResourceTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Core' And'$(JsonResourceTaskAssembly)' == ''">netstandard1.6\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
+		<JsonResourceTaskAssembly Condition="'$(JsonResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard1.6\Elemental.JsonResource.dll</JsonResourceTaskAssembly>
 	</PropertyGroup>
 
 	<ItemDefinitionGroup>
@@ -15,7 +14,7 @@
 
 	<ItemGroup>
 		<None Remove="**/*.resj"/>
-		<JsonResource Include="**/*.resj"/>		
+		<JsonResource Include="**/*.resj"/>
 	</ItemGroup>
 
 </Project>

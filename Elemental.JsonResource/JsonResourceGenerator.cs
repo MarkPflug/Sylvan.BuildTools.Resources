@@ -17,7 +17,7 @@ namespace Elemental.JsonResource
 		public static bool IsValidCulture(string name)
 		{
 #if NETSTANDARD1_6
-            return name.Length >= 2;
+			return name.Length >= 2;
 #else
 			if (cultures == null)
 			{
