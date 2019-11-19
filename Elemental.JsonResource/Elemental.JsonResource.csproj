@@ -15,7 +15,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Copyright>Copyright © Mark Pflug $([System.DateTime]::UtcNow.Year)</Copyright>
     <PackageTags>resj resource json</PackageTags>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <RepositoryUrl>https://github.com/MarkPflug/Elemental.JsonResource</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
