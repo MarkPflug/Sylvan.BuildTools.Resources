@@ -366,6 +366,8 @@ namespace Elemental.Json
 			this.value = value;
 		}
 
+		public bool IsDouble => this.isDouble;
+
 		public override JsonNodeType NodeType => JsonNodeType.Number;
 	}
 

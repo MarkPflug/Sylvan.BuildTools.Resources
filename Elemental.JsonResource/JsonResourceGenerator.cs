@@ -1,41 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Elemental.Json;
+﻿using Elemental.Json;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Elemental.JsonResource
 {
 	static class Culture
 	{
-		static HashSet<string> cultures;
-		static object sync = new object();
-
 		public static bool IsValidCulture(string name)
 		{
-#if NETSTANDARD1_6
 			return name.Length >= 2;
-#else
-			if (cultures == null)
-			{
-				lock (sync)
-				{
-					if (cultures == null)
-					{
-						cultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-						var tags = CultureInfo.GetCultures(CultureTypes.AllCultures).Select(c => c.IetfLanguageTag);
-						foreach (var tag in tags)
-						{
-							cultures.Add(tag);
-						}
-					}
-				}
-			}
-			return cultures.Contains(name);
-#endif
 		}
 	}
 

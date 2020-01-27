@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.3.1</VersionPrefix>
 
     <PackageProjectUrl>https://github.com/MarkPflug/Elemental.JsonResource</PackageProjectUrl>
     <PackageIconUrl>https://markpflug.github.io/MarkPflug.png</PackageIconUrl>
@@ -23,7 +23,7 @@
 
   <ItemGroup>
 
-    <None Include="..\LICENSE.txt" Pack="true" PackagePath=""/>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="" />
     <Content Include="build\*" PackagePath="build\">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -36,7 +36,7 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MSBuildGitHash" Version="0.5.0">
+    <PackageReference Include="MSBuildGitHash" Version="0.5.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
