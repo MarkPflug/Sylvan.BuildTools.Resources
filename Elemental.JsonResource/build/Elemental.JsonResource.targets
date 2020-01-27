@@ -27,7 +27,7 @@
 	>
 
 		<PropertyGroup>
-			<CodeGenerationRoot>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</CodeGenerationRoot>
+			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))</CodeGenerationRoot>
 		</PropertyGroup>
 
 		<ItemGroup>
