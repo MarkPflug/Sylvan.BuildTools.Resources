@@ -4,6 +4,8 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace Elemental.JsonResource
 {
@@ -80,6 +82,7 @@ namespace Elemental.JsonResource
 
 			var outCodeItems = new List<TaskItem>();
 			var outResItems = new List<TaskItem>();
+			string generatorVersion = typeof(JsonResourceGenerator).GetTypeInfo().Assembly.GetName().Version.ToString();
 
 
 			// loop over all the .resj files we were given
@@ -159,6 +162,11 @@ namespace Elemental.JsonResource
 
 							// very simplistic resource accessor class mostly duplicated from resx output.
 							w.WriteLine("using global::System.Reflection;");
+							w.WriteLine("/// <summary>");
+							w.WriteLine("/// A strongly-typed resource class, for looking up localized strings, etc.");
+							w.WriteLine("/// </summary>");
+							w.WriteLine("[global::System.Diagnostics.DebuggerNonUserCode()]");
+							w.WriteLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"" + typeof(JsonResourceGenerator).FullName + "\", \"" + generatorVersion + "\")]");
 							if (isPublic)
 								w.Write("public ");
 							w.WriteLine("static partial class " + className + " { ");
@@ -192,11 +200,17 @@ namespace Elemental.JsonResource
 									if (value.NodeType == JsonNodeType.Object)
 									{
 										var obj = (JsonObject) value;
-										foreach (var key in obj.Keys)
+										foreach (var item in obj)
 										{
-											w.WriteLine("public static string " + key + " {");
+											if (section == "Strings")
+											{
+												w.WriteLine("/// <summary>");
+												w.WriteLine("/// Looks up a localized string similar to " + new XElement("t", ((JsonString)item.Value).Value).LastNode.ToString() + ".");
+												w.WriteLine("/// </summary>");
+											}
+											w.WriteLine("public static string " + item.Key + " {");
 											w.WriteLine("get {");
-											w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
+											w.WriteLine("return ResourceManager.GetString(\"" + item.Key + "\", resourceCulture);");
 											w.WriteLine("}");
 											w.WriteLine("}");
 										}
