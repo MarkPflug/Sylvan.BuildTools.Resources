@@ -38,3 +38,9 @@ Example files:
   }
 }
 ```
+
+## Running Elemental.JsonResource.Tests on Unix
+If you'd like to develop Elemental.JsonResource under Mono, and encounter issues with reference assemblies not being found while running tests, you might need to run something similar beforehand ([source1](https://stackoverflow.com/a/55070707), [source2](https://github.com/Microsoft/msbuild/issues/2728#issuecomment-345381357)):
+```sh
+export FrameworkPathOverride=/lib/mono/4.6-api
+```
