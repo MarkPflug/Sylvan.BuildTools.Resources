@@ -1,0 +1,12 @@
+﻿{
+  "Strings": {
+    "Message":  "Hello, World",
+    // It is very important that the following value have a '/' as the first char
+    // of the new line.
+    "NewLineCommentBreaker": "This is a string with
+/ malicious intent.",
+
+    "NewLine": "This is a string with
+    malicious intent."
+  }
+}

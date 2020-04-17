@@ -91,6 +91,13 @@ namespace Elemental.JsonResource
 		}
 
 		[Fact]
+		public void BuildCommentsTest()
+		{
+			var exepath = BuildProject("Data/ProjComments/Proj.csproj");
+			Assert.Equal("Hello, World\r\n", GetOutput(exepath, ""));
+		}
+
+		[Fact]
 		public void BuildTest()
 		{
 			var exepath = BuildProject("Data/Proj1/Proj.csproj");
