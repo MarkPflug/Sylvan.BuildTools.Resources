@@ -157,7 +157,8 @@ namespace Elemental.JsonResource
 						{
 							if (!string.IsNullOrEmpty(ns))
 							{
-								w.WriteLine($"namespace {ns} {{\n");
+								w.WriteLine($"namespace {ns} {{");
+								w.WriteLine();
 							}
 
 
@@ -230,7 +231,7 @@ namespace Elemental.JsonResource
 													IEnumerable<string> commentLines = comment.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.None);
 													w.Write($@"
     /// <summary>
-    /// {string.Join("\n    /// ", commentLines)}.
+    /// {string.Join(Environment.NewLine + "    /// ", commentLines)}.
     /// </summary>");
 												}
 
@@ -261,7 +262,8 @@ namespace Elemental.JsonResource
 
 							if (!string.IsNullOrEmpty(ns))
 							{
-								w.WriteLine("\n}");
+								w.WriteLine();
+								w.WriteLine("}");
 							}
 						}
 					}
