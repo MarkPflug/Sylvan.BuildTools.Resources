@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-		<CodeGenTestRoot>../../../../../Elemental.JsonResource/bin/Debug/netstandard1.6/Build/</CodeGenTestRoot>
+		<CodeGenTestRoot>../../../../../Elemental.JsonResource/bin/Debug/netstandard1.6/build/</CodeGenTestRoot>
 		<JsonResourceTaskAssembly>../Elemental.JsonResource.dll</JsonResourceTaskAssembly>
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>

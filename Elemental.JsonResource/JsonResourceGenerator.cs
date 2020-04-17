@@ -4,6 +4,8 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace Elemental.JsonResource
 {
@@ -80,6 +82,8 @@ namespace Elemental.JsonResource
 
 			var outCodeItems = new List<TaskItem>();
 			var outResItems = new List<TaskItem>();
+			string generatorName = typeof(JsonResourceGenerator).FullName;
+			string generatorVersion = typeof(JsonResourceGenerator).GetTypeInfo().Assembly.GetName().Version.ToString();
 
 
 			// loop over all the .resj files we were given
@@ -153,33 +157,48 @@ namespace Elemental.JsonResource
 						{
 							if (!string.IsNullOrEmpty(ns))
 							{
-								w.WriteLine("namespace " + ns + " {");
+								w.WriteLine($"namespace {ns} {{\n");
 							}
 
 
 							// very simplistic resource accessor class mostly duplicated from resx output.
-							w.WriteLine("using global::System.Reflection;");
-							if (isPublic)
-								w.Write("public ");
-							w.WriteLine("static partial class " + className + " { ");
-							w.WriteLine("static global::System.Resources.ResourceManager rm;");
-							w.WriteLine("static global::System.Globalization.CultureInfo resourceCulture;");
-							w.WriteLine("static global::System.Resources.ResourceManager ResourceManager {");
-							w.WriteLine("get {");
-							w.WriteLine("if(object.ReferenceEquals(rm, null)) {");
-							w.WriteLine("rm = new global::System.Resources.ResourceManager(\"" + resName + "\", typeof(" + className + ").GetTypeInfo().Assembly);");
-							w.WriteLine("}");
-							w.WriteLine("return rm;");
-							w.WriteLine("}");
-							w.WriteLine("}");
-							w.WriteLine("static global::System.Globalization.CultureInfo Culture {");
-							w.WriteLine("get {");
-							w.WriteLine("return resourceCulture;");
-							w.WriteLine("}");
-							w.WriteLine("set {");
-							w.WriteLine("resourceCulture = value;");
-							w.WriteLine("}");
-							w.WriteLine("}");
+							w.Write($@"using global::System.Reflection;
+
+/// <summary>
+/// A strongly-typed resource class, for looking up localized strings, etc.
+/// </summary>
+[global::System.Diagnostics.DebuggerNonUserCode()]
+[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{generatorName}"", ""{generatorVersion}"")]
+{(isPublic ? "public " : string.Empty)}static partial class {className}
+{{
+    static global::System.Resources.ResourceManager rm;
+    static global::System.Globalization.CultureInfo resourceCulture;
+
+    static global::System.Resources.ResourceManager ResourceManager
+    {{
+        get
+        {{
+            if (object.ReferenceEquals(rm, null))
+            {{
+                rm = new global::System.Resources.ResourceManager(""{resName}"", typeof({className}).GetTypeInfo().Assembly);
+            }}
+
+            return rm;
+        }}
+    }}
+
+    static global::System.Globalization.CultureInfo Culture
+    {{
+        get
+        {{
+            return resourceCulture;
+        }}
+        set
+        {{
+            resourceCulture = value;
+        }}
+    }}
+");
 
 							foreach (var section in root.Keys)
 							{
@@ -187,29 +206,54 @@ namespace Elemental.JsonResource
 
 								switch (section)
 								{
-								case "Strings":
-								case "Files":
-									if (value.NodeType == JsonNodeType.Object)
-									{
-										var obj = (JsonObject) value;
-										foreach (var key in obj.Keys)
+									case "Strings":
+									case "Files":
+										if (value.NodeType == JsonNodeType.Object)
 										{
-											w.WriteLine("public static string " + key + " {");
-											w.WriteLine("get {");
-											w.WriteLine("return ResourceManager.GetString(\"" + key + "\", resourceCulture);");
-											w.WriteLine("}");
-											w.WriteLine("}");
-										}
-									}
-									else
-									{
-										//logger.ParseError("Expected Json object.", value);
-									}
+											var obj = (JsonObject) value;
+											foreach (var item in obj)
+											{
+												string comment = null;
+												if (section == "Strings")
+												{
+													// https://stackoverflow.com/a/19498780
+													string stringValue = new XText(((JsonString)item.Value).Value).ToString();
+													comment = $"Looks up a localized string similar to {stringValue.Substring(0, Math.Min(stringValue.Length, 100))}";
+												}
+												else if (section == "Files")
+												{
+													comment = $"Looks up a {item.Key} text file";
+												}
 
-									break;
-								default:
-									//logger.ParseError("Unexpected property.", value);
-									break;
+												if (comment != null)
+												{
+													IEnumerable<string> commentLines = comment.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.None);
+													w.Write($@"
+    /// <summary>
+    /// {string.Join("\n    /// ", commentLines)}.
+    /// </summary>");
+												}
+
+												w.Write($@"
+    public static string {item.Key}
+    {{
+        get
+        {{
+            return ResourceManager.GetString(""{item.Key}"", resourceCulture);
+        }}
+    }}
+");
+											}
+										}
+										else
+										{
+											//logger.ParseError("Expected Json object.", value);
+										}
+
+										break;
+									default:
+										//logger.ParseError("Unexpected property.", value);
+										break;
 								}
 							}
 
@@ -217,7 +261,7 @@ namespace Elemental.JsonResource
 
 							if (!string.IsNullOrEmpty(ns))
 							{
-								w.WriteLine("}");
+								w.WriteLine("\n}");
 							}
 						}
 					}
@@ -255,15 +299,15 @@ namespace Elemental.JsonResource
 						var isFile = false;
 						switch (section)
 						{
-						case "Strings":
-							isFile = false;
-							break;
-						case "Files":
-							isFile = true;
-							break;
-						default:
-							logger.ParseError("Unexpected section.", sectionNode);
-							continue;
+							case "Strings":
+								isFile = false;
+								break;
+							case "Files":
+								isFile = true;
+								break;
+							default:
+								logger.ParseError("Unexpected section.", sectionNode);
+								continue;
 						}
 
 						if (sectionNode.NodeType != JsonNodeType.Object)
