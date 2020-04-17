@@ -44,3 +44,10 @@ If you'd like to develop Elemental.JsonResource under Mono, and encounter issues
 ```sh
 export FrameworkPathOverride=/lib/mono/4.6-api
 ```
+
+
+## Release Notes:
+
+_0.4.0_ 
+ - Adds code comments to generated code, allowing projects that use WarningsAsErrors and DocumentationFile to compile without error.
+ - Big thanks to [@teddybeermaniac](https://github.com/teddybeermaniac) for his contribution here.
