@@ -1,5 +1,6 @@
-# Elemental.JsonResource
-Json Resource file support in C# projects.
+# Sylvan.BuildTools.Resources
+
+Provides Json Resource file support in C# projects.
 
 This provides an alternative to using resx files to defined resources in C# projects.
 The benefits over resx are:
@@ -8,7 +9,7 @@ The benefits over resx are:
 - Doesn't require modifying the .csproj (adding a single resx file will add ~12 lines to your csproj file)
 - Doesn't require Visual Studio to function. (resx files don't work in VS Code for example)
 
-Referencing the Elemental.JsonResource package will *not* add any dependency to your project. 
+Referencing the Sylvan.BuildTools.Resources package will *not* add any dependency to your project. 
 The package operates at build time and will embed resources in your output assembly, and includes compiled code files containing resource accessors.
 
 Json resource files use the ".resj" file extension, and a very simple json document to specify resources.
@@ -39,8 +40,8 @@ Example files:
 }
 ```
 
-## Running Elemental.JsonResource.Tests on Unix
-If you'd like to develop Elemental.JsonResource under Mono, and encounter issues with reference assemblies not being found while running tests, you might need to run something similar beforehand ([source1](https://stackoverflow.com/a/55070707), [source2](https://github.com/Microsoft/msbuild/issues/2728#issuecomment-345381357)):
+## Running Sylvan.BuildTools.Resources.Tests on Unix
+If you'd like to develop Sylvan.BuildTools.Resources under Mono, and encounter issues with reference assemblies not being found while running tests, you might need to run something similar beforehand ([source1](https://stackoverflow.com/a/55070707), [source2](https://github.com/Microsoft/msbuild/issues/2728#issuecomment-345381357)):
 ```sh
 export FrameworkPathOverride=/lib/mono/4.6-api
 ```

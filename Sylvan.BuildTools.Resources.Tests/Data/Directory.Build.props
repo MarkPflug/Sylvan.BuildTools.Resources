@@ -1,0 +1,9 @@
+﻿<Project>
+  <PropertyGroup>
+		<CodeGenTestRoot>../../../../../Sylvan.BuildTools.Resources/bin/Debug/netstandard1.6/build/</CodeGenTestRoot>
+		<JsonResourceTaskAssembly>../Sylvan.BuildTools.Resources.dll</JsonResourceTaskAssembly>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<Import Project="$(CodeGenTestRoot)Sylvan.BuildTools.Resources.props"/>
+</Project>

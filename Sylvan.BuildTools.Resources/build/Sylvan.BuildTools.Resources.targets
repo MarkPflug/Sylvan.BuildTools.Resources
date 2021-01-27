@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project
+	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
+	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="DetermineNamespace"/>
+
+	<ItemGroup>
+		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.xaml" />
+		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.ContentType.xaml" />
+		<AvailableItemName Include="JsonResource"/>
+	</ItemGroup>
+
+	<PropertyGroup>
+
+		<CoreCompileDependsOn>
+			GenerateJsonResource;
+			$(CoreCompileDependsOn)
+		</CoreCompileDependsOn>
+
+	</PropertyGroup>
+
+	<Target
+		Name="GenerateJsonResource"
+		BeforeTargets="BeforeBuild"
+		Condition="'@(JsonResource)' != ''"
+	>
+
+		<PropertyGroup>
+			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))</CodeGenerationRoot>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<JsonResourceTemp Include="@(JsonResource)"/>
+			<JsonResource Remove="@(JsonResource)"/>
+		</ItemGroup>
+
+		<DetermineNamespace
+			Items="@(JsonResourceTemp)"
+			NamespaceRoot="$(RootNamespace)">
+			<Output TaskParameter="Output"
+				ItemName="JsonResource"/>
+		</DetermineNamespace>
+
+		<JsonResourceGenerator
+			OutputPath="$(CodeGenerationRoot)"
+			InputFiles="@(JsonResource)"
+		>
+			<Output TaskParameter="OutputCode" ItemName="ResourceCodeFile"/>
+			<Output TaskParameter="OutputResources" ItemName="ResourceResFile"/>
+		</JsonResourceGenerator>
+
+		<ItemGroup>
+			<Compile Include="@(ResourceCodeFile)"/>
+			<EmbeddedResource Include="@(ResourceResFile)"/>
+		</ItemGroup>
+	</Target>
+</Project>
