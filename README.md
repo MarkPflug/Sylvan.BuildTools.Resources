@@ -40,7 +40,7 @@ Example files:
 }
 ```
 
-You can generate controll the resource generation specifying a custom namespace, or the visibility of the generated class:
+You can control the resource generation specifying a custom namespace, and the visibility of the generated class:
 
 ```
   <ItemGroup>
