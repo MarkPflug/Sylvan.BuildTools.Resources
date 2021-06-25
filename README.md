@@ -40,6 +40,18 @@ Example files:
 }
 ```
 
+You can generate controll the resource generation specifying a custom namespace, or the visibility of the generated class:
+
+```
+  <ItemGroup>
+    <JsonResource Update="Path/To/Resource.resj">
+      <AccessModifier>Public</AccessModifier>
+      <Namespace>CustomNS</Namespace>
+      <ResourceName>CustomResourceName</ResourceName>
+    </JsonResource>
+  </ItemGroup>
+```
+
 ## Running Sylvan.BuildTools.Resources.Tests on Unix
 If you'd like to develop Sylvan.BuildTools.Resources under Mono, and encounter issues with reference assemblies not being found while running tests, you might need to run something similar beforehand ([source1](https://stackoverflow.com/a/55070707), [source2](https://github.com/Microsoft/msbuild/issues/2728#issuecomment-345381357)):
 ```sh
