@@ -40,20 +40,22 @@ namespace Sylvan.BuildTools.Resources
 			this.errorHandler = errorHandler;
 		}
 
-		void HandleError()
+		bool HandleError()
 		{
-			HandleError(JsonErrorCode.Unknown, Location);
+			return HandleError(JsonErrorCode.Unknown, Location);
 		}
 
-		void HandleError(JsonErrorCode code)
+		bool HandleError(JsonErrorCode code)
 		{
-			HandleError(code, Location);
+			return HandleError(code, Location);
 		}
 
-		void HandleError(JsonErrorCode code, Location location)
+		bool HandleError(JsonErrorCode code, Location location)
 		{
-			if (!errorHandler(code, location))
-				throw new JsonParseException(code, location);
+			return 
+				errorHandler(code, location)
+				? false
+				: throw new JsonParseException(code, location);
 		}
 
 		void NewLine()
@@ -587,6 +589,9 @@ namespace Sylvan.BuildTools.Resources
 							}
 						}
 						break;
+					default:
+							HandleError(JsonErrorCode.UnexpectedCharacter);
+							break;
 					}
 				}
 			}

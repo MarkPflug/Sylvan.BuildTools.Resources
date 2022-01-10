@@ -1,5 +1,7 @@
 ﻿using Microsoft.Build.Framework;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using Xunit.Abstractions;
 
 namespace Sylvan.BuildTools.Resources
@@ -28,9 +30,15 @@ namespace Sylvan.BuildTools.Resources
 			eventSource.ErrorRaised += EventSource_ErrorRaised;
 		}
 
+		List<string> errors = new List<string>();
+
+		public string ErrorMessage => string.Join(Environment.NewLine, errors);
+
 		private void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
 		{
-			o.WriteLine(e.Message + " " + e.File + "(" + e.LineNumber + "," + e.ColumnNumber + ")");
+			var str = e.Message + " " + e.File + "(" + e.LineNumber + "," + e.ColumnNumber + ")";
+			o.WriteLine(str);
+			errors.Add(str);
 		}
 
 		private void EventSource_MessageRaised(object sender, BuildMessageEventArgs e)

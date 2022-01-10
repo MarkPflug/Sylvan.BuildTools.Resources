@@ -278,10 +278,6 @@ namespace Sylvan.BuildTools.Resources
 						goto start;
 					case TokenKind.None:
 						return false;
-					case TokenKind.StartArray:
-					case TokenKind.EndArray:
-						HandleError(JsonErrorCode.MultipleRootElements);
-						return false;
 					default:
 						HandleError(JsonErrorCode.ExpectedEndOfText);
 						return false;

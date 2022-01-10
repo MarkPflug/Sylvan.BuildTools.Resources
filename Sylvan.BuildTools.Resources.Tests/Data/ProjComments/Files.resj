@@ -1,5 +1,5 @@
 {
   "Files": {
-    "ComplexQuery": "sql/query.sql"
+    "ComplexQuery": "query.sql"
   }
 }

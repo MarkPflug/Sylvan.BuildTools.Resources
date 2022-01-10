@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <VersionPrefix>0.5.0</VersionPrefix>
+    <VersionPrefix>0.5.1</VersionPrefix>
 
     <PackageProjectUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</PackageProjectUrl>
     <Authors>Mark Pflug</Authors>
@@ -15,10 +15,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Copyright>Copyright © Mark Pflug $([System.DateTime]::UtcNow.Year)</Copyright>
     <PackageTags>resj resource json</PackageTags>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+	<DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>
