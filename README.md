@@ -1,6 +1,8 @@
 # Sylvan.BuildTools.Resources
 
-Provides Json Resource file support in C# projects.
+Provides resource file support and code-gen in C# projects.
+
+## .resj files
 
 This provides an alternative to using resx files to defined resources in C# projects.
 The benefits over resx are:
@@ -53,13 +55,16 @@ You can control the resource generation specifying a custom namespace, and the v
 ```
 
 ## Running Sylvan.BuildTools.Resources.Tests on Unix
+
 If you'd like to develop Sylvan.BuildTools.Resources under Mono, and encounter issues with reference assemblies not being found while running tests, you might need to run something similar beforehand ([source1](https://stackoverflow.com/a/55070707), [source2](https://github.com/Microsoft/msbuild/issues/2728#issuecomment-345381357)):
 ```sh
 export FrameworkPathOverride=/lib/mono/4.6-api
 ```
 
-
 ## Release Notes:
+
+_0.6.0_
+ - Adds support for generating static code from a folder holding static resources (non-localizable).
 
 _0.4.0_ 
  - Adds code comments to generated code, allowing projects that use WarningsAsErrors and DocumentationFile to compile without error.

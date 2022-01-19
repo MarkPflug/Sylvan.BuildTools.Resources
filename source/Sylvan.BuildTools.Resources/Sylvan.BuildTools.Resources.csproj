@@ -1,35 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <VersionPrefix>0.5.1</VersionPrefix>
+    <VersionPrefix>0.6.0</VersionPrefix>
+	<VersionSuffix>b0001</VersionSuffix>
 
-    <PackageProjectUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</PackageProjectUrl>
-    <Authors>Mark Pflug</Authors>
     <Title>Sylvan Json Resource</Title>
     <Summary>Sylvan Json Resource provides a Json based alternative to resx resource files.</Summary>
     <Description>Json Resource File</Description>
-    <PackageLicenseFile>license.txt</PackageLicenseFile>
-    <PackageIcon>Sylvan.png</PackageIcon>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <PackageTags>resj;resource;json</PackageTags>
+    
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <Copyright>Copyright © Mark Pflug $([System.DateTime]::UtcNow.Year)</Copyright>
-    <PackageTags>resj resource json</PackageTags>
-    <LangVersion>10.0</LangVersion>
-    <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 	<DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>
-
-    <None Include="..\license.txt" Pack="true" PackagePath="">
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\Sylvan.png" Pack="true" PackagePath="">
-      <Visible>false</Visible>
-    </None>
     <Content Include="build\*" PackagePath="build\">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
