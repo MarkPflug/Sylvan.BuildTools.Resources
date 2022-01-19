@@ -61,6 +61,12 @@ export FrameworkPathOverride=/lib/mono/4.6-api
 
 ## Release Notes:
 
+_0.5.1_
+ - Mark package as `DevelopmentDependency` so it doesn't become a transitive dependency for consuming packages.
+
+_0.5.0_
+ - Project/package renamed to avoid name collision with evil mega-corp.
+
 _0.4.0_ 
  - Adds code comments to generated code, allowing projects that use WarningsAsErrors and DocumentationFile to compile without error.
  - Big thanks to [@teddybeermaniac](https://github.com/teddybeermaniac) for his contribution here.
