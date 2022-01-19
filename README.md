@@ -65,7 +65,7 @@ _0.5.1_
  - Mark package as `DevelopmentDependency` so it doesn't become a transitive dependency for consuming packages.
 
 _0.5.0_
- - Project/package renamed to avoid name collision with evil mega-corp.
+ - Project/package renamed to avoid name collision with technology from mega-corp.
 
 _0.4.0_ 
  - Adds code comments to generated code, allowing projects that use WarningsAsErrors and DocumentationFile to compile without error.
