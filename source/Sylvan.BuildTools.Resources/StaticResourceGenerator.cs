@@ -34,16 +34,16 @@ namespace Sylvan.BuildTools.Resources
 				return true;
 
 			var outCodeItems = new List<TaskItem>();
-			string generatorName = typeof(JsonResourceGenerator).FullName;
-			string generatorVersion = typeof(JsonResourceGenerator).GetTypeInfo().Assembly.GetName().Version.ToString();
+			var generatorType = this.GetType();
+			string generatorName = generatorType.FullName;
+			string generatorVersion = generatorType.GetTypeInfo().Assembly.GetName().Version.ToString();
 
 			// loop over all the folders
 			foreach (var folder in InputFolders)
 			{
 				if (!Directory.Exists(folder.ItemSpec))
 				{
-					//TODO: error
-
+					this.Log.LogError($"StaticResourceFolder {folder.ItemSpec} does not exist.");
 					continue;
 				}
 				
@@ -72,7 +72,7 @@ namespace Sylvan.BuildTools.Resources
 						w.WriteLine();
 					}
 
-					w.WriteLine(@"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{generatorName}"", ""{generatorVersion}"")]");
+					w.WriteLine($@"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{generatorName}"", ""{generatorVersion}"")]");
 					WriteClass(w, folder.ItemSpec, isPublic);
 
 					if (!string.IsNullOrEmpty(ns))

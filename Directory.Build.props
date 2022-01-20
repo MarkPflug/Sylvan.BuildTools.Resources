@@ -16,13 +16,8 @@
     <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
 	<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
 	<RepositoryType>git</RepositoryType>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <EmbedAllSources>true</EmbedAllSources>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DeterministicSourcePaths>true</DeterministicSourcePaths>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests')) == 'true'">true</IsTestProject>
 

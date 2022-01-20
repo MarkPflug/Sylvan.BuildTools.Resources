@@ -2,16 +2,19 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <VersionPrefix>0.6.0</VersionPrefix>
-	<VersionSuffix>b0001</VersionSuffix>
 
     <Title>Sylvan Json Resource</Title>
     <Summary>Sylvan Json Resource provides a Json based alternative to resx resource files.</Summary>
     <Description>Json Resource File</Description>
     <PackageTags>resj;resource;json</PackageTags>
     
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+	<NoPackageAnalysis>true</NoPackageAnalysis>
+	<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<PackageTags>resj resource json</PackageTags>
+	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 	<DevelopmentDependency>true</DevelopmentDependency>
+
   </PropertyGroup>
 
   <ItemGroup>

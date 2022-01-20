@@ -3,7 +3,7 @@
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
-		<SylvanResourceTaskAssembly Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard1.6\Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
+		<SylvanResourceTaskAssembly Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard1.6/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
 	</PropertyGroup>
 
 	<ItemDefinitionGroup>
@@ -19,12 +19,8 @@
 		<None Remove="**/*.resj"/>
 		<JsonResource Include="**/*.resj"/>
 		
-		<StaticResourceFolder
-			Condition="Exists($(DefaultStaticResourceRoot))" 
-			Include="$(DefaultStaticResourceRoot)"/>
-		
 		<StaticResourceFiles 
-			Include="%(StaticResourceFolder)/**/*"/>
+			Include="%(StaticResourceFolder.Identity)/**/*"/>
 	</ItemGroup>
 
 </Project>
