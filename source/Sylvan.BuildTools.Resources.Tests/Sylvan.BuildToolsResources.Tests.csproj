@@ -33,4 +33,11 @@
 		</Content>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Remove="Data\StaticName\string_values\primary_heading.txt" />
+	  <None Remove="Data\StaticNested\A\B\C\value.txt" />
+	  <None Remove="Data\StaticNested\A\B\value.txt" />
+	  <None Remove="Data\StaticNested\A\value.txt" />
+	</ItemGroup>
+
 </Project>

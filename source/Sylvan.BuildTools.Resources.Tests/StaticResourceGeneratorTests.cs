@@ -20,5 +20,19 @@ public class StaticResourceGeneratorTests : MSBuildTestBase
 		var exepath = BuildProject("Data/StaticEscape/Proj.csproj");
 		Assert.Equal($"™\r\n\t", GetOutput(exepath, ""));
 	}
+
+	[Fact]
+	public void Name()
+	{
+		var exepath = BuildProject("Data/StaticName/Proj.csproj");
+		Assert.Equal($"success", GetOutput(exepath, ""));
+	}
+
+	[Fact]
+	public void Nested()
+	{
+		var exepath = BuildProject("Data/StaticNested/Proj.csproj");
+		Assert.Equal($"abc", GetOutput(exepath, ""));
+	}
 }
 

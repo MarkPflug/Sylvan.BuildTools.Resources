@@ -77,6 +77,7 @@
 		<StaticResourceGenerator
 			OutputPath="$(CodeGenerationRoot)"
 			InputFolders="@(StaticResourceFolder)"
+			Namespace="$(RootNamespace)"
 		>
 			<Output TaskParameter="OutputCode" ItemName="StaticResourceCodeFile"/>
 		</StaticResourceGenerator>

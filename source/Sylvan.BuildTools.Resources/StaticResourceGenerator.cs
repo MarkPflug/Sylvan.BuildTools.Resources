@@ -17,49 +17,15 @@ namespace Sylvan.BuildTools.Resources
 		// The folders to generate types from.
 		public ITaskItem[] InputFolders { get; set; }
 
+		public string Namespace { get; set; }
+
 		// Will contain all of the generated coded we create
 		[Output]
 		public ITaskItem[] OutputCode { get; set; }
 
 		bool hasError = false;
 
-		//class FileErrorLogger
-		//{
-		//	JsonResourceGenerator task;
-		//	string file;
-
-		//	public FileErrorLogger(JsonResourceGenerator task, string file)
-		//	{
-		//		this.task = task;
-		//		this.file = file;
-		//	}
-
-		//	public bool JsonError(JsonErrorCode error, Location loc)
-		//	{
-		//		task.hasError = true;
-		//		task.Log.LogError(null, "JP" + ((int) error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
-		//		return true;
-		//	}
-
-		//	public void ParseError(string message, JsonReader reader)
-		//	{
-		//		ParseError(message, reader.Start, reader.End);
-		//	}
-
-		//	public void ParseError(string message, Location start, Location end)
-		//	{
-		//		task.Log.LogError(null, "JS0001", null, file, start.Line, start.Column, end.Line, end.Column, message, null);
-		//	}
-
-		//	public void ParseError(string message, JsonNode node)
-		//	{
-		//		ParseError(message, node.Start, node.End);
-		//	}
-		//}
-
 		const string AccessPublic = "Public";
-		const string AccessInternal = "Internal";
-		const string AccessNoCodeGen = "NoCodeGen";
 
 		// The method that is called to invoke our task.
 		public override bool Execute()
@@ -71,7 +37,6 @@ namespace Sylvan.BuildTools.Resources
 			string generatorName = typeof(JsonResourceGenerator).FullName;
 			string generatorVersion = typeof(JsonResourceGenerator).GetTypeInfo().Assembly.GetName().Version.ToString();
 
-
 			// loop over all the folders
 			foreach (var folder in InputFolders)
 			{
@@ -81,11 +46,9 @@ namespace Sylvan.BuildTools.Resources
 
 					continue;
 				}
-
 				
 				var root = Path.GetFileName(folder.ItemSpec);
 
-				var className = root;
 
 				Directory.CreateDirectory(OutputPath);
 
@@ -95,6 +58,7 @@ namespace Sylvan.BuildTools.Resources
 				var isPublic = StringComparer.OrdinalIgnoreCase.Equals(access, AccessPublic);
 
 				var ns = folder.GetMetadata("Namespace");
+				ns = string.IsNullOrWhiteSpace(ns) ? Namespace : ns;
 
 				outCodeItems.Add(new TaskItem(codeFile));
 				Directory.CreateDirectory(Path.GetDirectoryName(codeFile));
@@ -108,45 +72,70 @@ namespace Sylvan.BuildTools.Resources
 						w.WriteLine();
 					}
 
+					w.WriteLine(@"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{generatorName}"", ""{generatorVersion}"")]");
+					WriteClass(w, folder.ItemSpec, isPublic);
 
-					// very simplistic resource accessor class mostly duplicated from resx output.
-					w.Write($@"
-
-/// <summary>
-/// A static resource class, for looking up strings, etc.
-/// </summary>
-[global::System.Diagnostics.DebuggerNonUserCode()]
-[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{generatorName}"", ""{generatorVersion}"")]
-{(isPublic ? "public " : string.Empty)}static partial class {className}
-{{
-");
-					foreach (var file in Directory.EnumerateFiles(folder.ItemSpec, "*", SearchOption.TopDirectoryOnly))
+					if (!string.IsNullOrEmpty(ns))
 					{
-						var name = Path.GetFileNameWithoutExtension(file);
-
-
-						var comment = $"Gets the string contents of {Path.GetFileName(file)}.";
-						if (comment != null)
-						{
-							IEnumerable<string> commentLines = comment.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.None);
-							w.Write($@"
-    /// <summary>
-    /// {string.Join(Environment.NewLine + "    /// ", commentLines)}.
-    /// </summary>");
-						}
-
-						var str = CSharpStringEscape(File.ReadAllText(file));
-						w.Write($@"
-    public static readonly string {name} = ""{str}"";
-");
+						w.WriteLine("}");
+						w.WriteLine();
 					}
-					w.WriteLine("}");
 				}
 			}
 
 			// put the artifacts we created in the output properties.
 			OutputCode = outCodeItems.ToArray();
 			return !hasError;
+		}
+
+		void WriteClass(TextWriter w, string folder, bool isPublic, int depth = 0)
+		{
+
+			var className = Path.GetFileNameWithoutExtension(folder);
+			className = IdentifierStyle.PascalCase.Convert(className);
+
+			// very simplistic resource accessor class mostly duplicated from resx output.
+			w.Write($@"
+
+/// <summary>
+/// A static resource class, for looking up strings, etc.
+/// </summary>
+[global::System.Diagnostics.DebuggerNonUserCode()]
+
+{((isPublic || depth > 0) ? "public " : string.Empty)}static partial class {className}
+{{
+");
+
+			foreach (var file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
+			{
+				var name = Path.GetFileNameWithoutExtension(file);
+
+				name = IdentifierStyle.PascalCase.Convert(name);
+
+
+				var comment = $"Gets the string contents of {Path.GetFileName(file)}.";
+				if (comment != null)
+				{
+					IEnumerable<string> commentLines = comment.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.None);
+					w.Write($@"
+    /// <summary>
+    /// {string.Join(Environment.NewLine + "    /// ", commentLines)}.
+    /// </summary>");
+				}
+
+				var str = CSharpStringEscape(File.ReadAllText(file));
+				w.Write($@"
+    public static readonly string {name} = ""{str}"";
+");
+
+				foreach(var child in Directory.EnumerateDirectories(folder))
+				{
+					WriteClass(w, child, isPublic, depth + 1);
+				}
+			}
+
+			w.WriteLine("}");
+
 		}
 
 		static string CSharpStringEscape(string str)
