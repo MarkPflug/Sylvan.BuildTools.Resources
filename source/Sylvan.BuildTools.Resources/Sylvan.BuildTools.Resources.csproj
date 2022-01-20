@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <VersionPrefix>0.6.0</VersionPrefix>
+
+    <Title>Sylvan Json Resource</Title>
+    <Summary>Sylvan Json Resource provides a Json based alternative to resx resource files.</Summary>
+    <Description>Json Resource File</Description>
+    <PackageTags>resj;resource;json</PackageTags>
+    
+	<NoPackageAnalysis>true</NoPackageAnalysis>
+	<BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<PackageTags>resj resource json</PackageTags>
+	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+	<DevelopmentDependency>true</DevelopmentDependency>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\*" PackagePath="build\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

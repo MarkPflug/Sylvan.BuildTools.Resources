@@ -2,8 +2,9 @@
 <Project
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
-	<UsingTask AssemblyFile="$(JsonResourceTaskAssembly)" TaskName="DetermineNamespace"/>
+	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
+	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="StaticResourceGenerator"/>
+	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="DetermineNamespace"/>
 
 	<ItemGroup>
 		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.xaml" />
@@ -15,19 +16,25 @@
 
 		<CoreCompileDependsOn>
 			GenerateJsonResource;
+			GenerateStaticResource;
 			$(CoreCompileDependsOn)
 		</CoreCompileDependsOn>
 
 	</PropertyGroup>
+
+	<ItemGroup>
+
+		<StaticResourceFiles
+			Include="%(StaticResourceFolder)/**/*"/>
+	</ItemGroup>
 
 	<Target
 		Name="GenerateJsonResource"
 		BeforeTargets="BeforeBuild"
 		Condition="'@(JsonResource)' != ''"
 	>
-
 		<PropertyGroup>
-			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))</CodeGenerationRoot>
+			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>
 		</PropertyGroup>
 
 		<ItemGroup>
@@ -53,6 +60,29 @@
 		<ItemGroup>
 			<Compile Include="@(ResourceCodeFile)"/>
 			<EmbeddedResource Include="@(ResourceResFile)"/>
+		</ItemGroup>
+	</Target>
+
+	<Target
+		Name="GenerateStaticResource"
+		BeforeTargets="BeforeBuild"
+		Condition="'@(StaticResourceFolder)' != ''"
+	>
+
+		<PropertyGroup>
+			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanStaticResources</CodeGenerationRoot>
+		</PropertyGroup>
+
+		<StaticResourceGenerator
+			OutputPath="$(CodeGenerationRoot)"
+			InputFolders="@(StaticResourceFolder)"
+			Namespace="$(RootNamespace)"
+		>
+			<Output TaskParameter="OutputCode" ItemName="StaticResourceCodeFile"/>
+		</StaticResourceGenerator>
+
+		<ItemGroup>
+			<Compile Include="@(StaticResourceCodeFile)"/>
 		</ItemGroup>
 	</Target>
 </Project>

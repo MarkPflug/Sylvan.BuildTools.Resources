@@ -1,0 +1,47 @@
+<Project>
+  <PropertyGroup>
+    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)packages\</PackageOutputPath>
+    <Owner>Mark Pflug</Owner>
+    <Authors>$(Owner)</Authors>
+    <PackageIconUrl>https://markpflug.github.io/Sylvan.png</PackageIconUrl>
+    <PackageIcon>Sylvan.png</PackageIcon>
+	<Year>2022</Year>
+    <Copyright>© $(Year) $(Owner)</Copyright>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <LangVersion>10.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>CS1030;CA1835;$(WarningsNotAsErrors)</WarningsNotAsErrors>
+
+    <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
+	<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+	<RepositoryType>git</RepositoryType>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests')) == 'true'">true</IsTestProject>
+
+	<ReadmeFile>$(MSBuildThisFileDirectory)readme.md</ReadmeFile>
+	<PackageReadmeFile
+		Condition="Exists($(ReadmeFile))">readme.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)license.txt" Pack="true" PackagePath="">
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Sylvan.png" Pack="true" PackagePath="">
+      <Visible>false</Visible>
+    </None>
+	<None
+	  Condition="Exists($(ReadmeFile))"
+	  Include="$(ReadmeFile)"
+	  Pack="true"
+	  PackagePath=""/>
+  </ItemGroup>
+
+	<PropertyGroup Condition="$(IsTestProject) == true">
+		<NoWarn>xunit2013</NoWarn>
+	</PropertyGroup>
+    
+
+</Project>

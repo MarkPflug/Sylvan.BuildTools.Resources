@@ -1,16 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29418.71
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sylvan.BuildTools.Resources", "Sylvan.BuildTools.Resources\Sylvan.BuildTools.Resources.csproj", "{5AABA80C-8F46-4C6E-A00E-782A183187B1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sylvan.BuildToolsResources.Tests", "Sylvan.BuildTools.Resources.Tests\Sylvan.BuildToolsResources.Tests.csproj", "{D2A48684-232E-46CD-BB1E-E2512E42763E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40F9912F-7F24-48AA-BEA5-2326C53D7106}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{FC1FCE9D-D24D-4EFC-BA17-3F691D1783A3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		README.md = README.md
+		..\Directory.Build.props = ..\Directory.Build.props
+		..\Directory.Build.targets = ..\Directory.Build.targets
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Global
