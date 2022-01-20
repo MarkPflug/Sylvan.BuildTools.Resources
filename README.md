@@ -95,10 +95,15 @@ The generated code is not included in the project source code, and the generated
 _0.6.0_
  - Adds support for generating static code from a folder holding static resources (non-localizable).
 
+_0.5.1_
+ - Mark package as `DevelopmentDependency` so it doesn't become a transitive dependency for consuming packages.
+
+_0.5.0_
+ - Project/package renamed to avoid name collision with technology from mega-corp.
+
 _0.4.0_ 
  - Adds code comments to generated code, allowing projects that use WarningsAsErrors and DocumentationFile to compile without error.
  - Big thanks to [@teddybeermaniac](https://github.com/teddybeermaniac) for his contribution here.
-
 
 ## Running Sylvan.BuildTools.Resources.Tests on Unix
 
