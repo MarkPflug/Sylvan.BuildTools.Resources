@@ -7,24 +7,25 @@ create a transitive package dependency for your nuget package.
 The package operates at build time and will embed resources in your output assembly, 
 and includes compiled code files containing resource accessors.
 
-## Localised Resource .resj Files
+## Localized Resource .resj Files
 
-This provides an alternative to using resx files to defined resources in C# projects.
+JSON resource files provides an alternative to using resx XML resource files to define resources in C# projects.
 
 The benefits over resx are:
+
 - human authorable file format (resx is human readable, but diffcult to autor without documentation or tooling support)
 - generated C# code doesn't get included in project/source control (unlike designer.cs files)
 - Doesn't require modifying the .csproj (adding a single resx file will add ~12 lines to your csproj file)
 - Implemented with build-time code-gen and doesn't require Visual Studio to function. (resx files require Visual Studio design time code gen)
 - Still get Intellisense in Visual Studio for the generated code.
 
-Json resource files use the ".resj" file extension, and a very simple json document to specify resources.
+JSON resource files use the ".resj" file extension, and a very simple json document to specify resources.
 Currently supports strings and text files. Text file path should be specified relative to the resj file location. 
 Supports creating localized satellite assemblies using the same naming convention as resx.
 
 Example files:
 
-`[Resources.json]`
+`[Resources.resj]`
 ```json
 {
   "Strings": {
@@ -37,7 +38,7 @@ Example files:
 }
 ```
 
-`[Resources.de-DE.json]`
+`[Resources.de-DE.resj]`
 ```json
 {
   "Strings": {
@@ -64,11 +65,12 @@ You can control the resource generation specifying a custom namespace, and the v
 The static string code generation feature allows adding string constants to your project where each string constant
 is defined in a separate file in a folder structure. 
 This is intended to support scenarios where you need to include long string constants that contain structured language
-that would be better maintained in a separate file. 
+that would be better maintained in a separate file, instead of inlining the code in a C# file. 
 This allows text like long SQL queries, chunks of HTML or JavaScript to be edited in a file with appropriate syntax highlighting,
 then accessed from C# code as if it were defined as a native string constant.
 
-StaticResources are added to a project by defining a `StaticResourceFolder` item in the .csproj file.
+Static resources are added to a project by defining a `StaticResourceFolder` item in the .csproj file, 
+which names a folder that contains static resource files.
 
 ```xml
 	<ItemGroup>
@@ -76,7 +78,7 @@ StaticResources are added to a project by defining a `StaticResourceFolder` item
 	</ItemGroup>
 ```
 
-If the `Sql` folder contained a file named `select_user_data.sql` it would generate code roughly equivalent to the following:
+If the `Sql` folder contains a file named `select_user_data.sql` it would generate code roughly equivalent to the following:
 
 ```
 namespace ProjectRootNamespace {
