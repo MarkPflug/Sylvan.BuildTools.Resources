@@ -88,7 +88,7 @@ namespace ProjectRootNamespace {
 }
 ```
 
-The generated code is not included in the project source code, and the generated types/members will still be visible in intellisense.
+The generated code is compiled into the project assembly, but is not included in the project source code. The generated types/members will still be visible in intellisense in Visual Studio.
 
 ## Release Notes:
 
