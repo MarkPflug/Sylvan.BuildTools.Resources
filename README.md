@@ -13,7 +13,7 @@ JSON resource files provides an alternative to using resx XML resource files to 
 
 The benefits over resx are:
 
-- human authorable file format (resx is human readable, but diffcult to autor without documentation or tooling support)
+- human authorable file format (resx is human readable, but diffcult to author without documentation or tooling support)
 - generated C# code doesn't get included in project/source control (unlike designer.cs files)
 - Doesn't require modifying the .csproj (adding a single resx file will add ~12 lines to your csproj file)
 - Implemented with build-time code-gen and doesn't require Visual Studio to function. (resx files require Visual Studio design time code gen)
