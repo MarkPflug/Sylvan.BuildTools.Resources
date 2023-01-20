@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace Sylvan.BuildTools.Resources;
@@ -33,6 +33,23 @@ public class StaticResourceGeneratorTests : MSBuildTestBase
 	{
 		var exepath = BuildProject("Data/StaticNested/Proj.csproj");
 		Assert.Equal($"abc", GetOutput(exepath, ""));
+	}
+
+	[Fact]
+	public void PreProcessing()
+	{
+		var exepath = BuildProject("Data/Preprocessing/Proj.csproj");
+		Assert.Equal($"select * from your_table", GetOutput(exepath, ""));
+	}
+
+	[Fact]
+	public void PreprocessingMoreComplex()
+	{
+		var exepath = BuildProject("Data/PreprocessingMoreComplex/Proj.csproj");
+		Assert.Equal($@"/*--IGNORE-BEGIN--
+DECLARE @MyUserId INT = 1;
+--IGNORE-END--*/
+SELECT * FROM [dbo].[User] WHERE [Id] = @MyUserId;", GetOutput(exepath, ""));
 	}
 }
 
