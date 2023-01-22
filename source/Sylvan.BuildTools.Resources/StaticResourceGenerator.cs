@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace Sylvan.BuildTools.Resources
 					this.Log.LogError($"StaticResourceFolder {folder.ItemSpec} does not exist.");
 					continue;
 				}
-				
+
 				var root = Path.GetFileName(folder.ItemSpec);
 
 
@@ -106,6 +106,19 @@ namespace Sylvan.BuildTools.Resources
 {{
 ");
 
+			w.Write($@"
+    /// <summary>
+    /// Allow some custom string processing.
+    /// </summary>
+    static partial void PreProcess(ref string s);
+
+    static string Process(string str)
+    {{
+        PreProcess(ref str);
+        return str;
+    }}
+");
+
 			foreach (var file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
 			{
 				var name = Path.GetFileNameWithoutExtension(file);
@@ -125,7 +138,7 @@ namespace Sylvan.BuildTools.Resources
 
 				var str = CSharpStringEscape(File.ReadAllText(file));
 				w.Write($@"
-    public static readonly string {name} = ""{str}"";
+    public static readonly string {name} = Process(""{str}"");
 ");
 
 				foreach(var child in Directory.EnumerateDirectories(folder))
@@ -184,7 +197,7 @@ namespace Sylvan.BuildTools.Resources
 						if (c >= ' ' && c <= 127)
 						{
 							sb.Append(c);
-						} 
+						}
 						else
 						{
 							sb.Append("\\u");
