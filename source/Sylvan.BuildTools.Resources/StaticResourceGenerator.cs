@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
@@ -108,7 +108,7 @@ namespace Sylvan.BuildTools.Resources
 
 			w.Write($@"
     /// <summary>
-	/// Allow some custom string processing.
+    /// Allow some custom string processing.
     /// </summary>
     static partial void PreProcess(ref string s);
 
