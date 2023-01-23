@@ -20,12 +20,14 @@ namespace Sylvan.BuildTools.Resources
 			var doc = new JsonDocument();
 			nodeStack.Push(doc);
 
-			var propertyStack = new Stack<string>();
+			var propertyStack = new Stack<JsonString>();
 			JsonNode node = null;
 
-			while (reader.Read()) {
+			while (reader.Read())
+			{
 
-				switch (reader.SyntaxKind) {
+				switch (reader.SyntaxKind)
+				{
 				case SyntaxKind.Comment:
 				case SyntaxKind.None:
 					continue;
@@ -76,21 +78,25 @@ namespace Sylvan.BuildTools.Resources
 
 				var parent = nodeStack.Peek();
 
-				if (parent is JsonArray a) {
+				if (parent is JsonArray a)
+				{
 					a.Add(node);
 				}
 				else
-				if (parent is JsonObject o) {
+				if (parent is JsonObject o)
+				{
 					var propertyName = propertyStack.Pop();
 					o.Add(propertyName, node);
 				}
 				else
-				if (parent is JsonDocument d) {
+				if (parent is JsonDocument d)
+				{
 					d.RootNode = node;
 					break;
 				}
 			}
-			if (doc.RootNode != null) {
+			if (doc.RootNode != null)
+			{
 				doc.Start = doc.RootNode.Start;
 				doc.End = doc.RootNode.End;
 			}
@@ -144,95 +150,25 @@ namespace Sylvan.BuildTools.Resources
 		}
 	}
 
-	public sealed class JsonObject : JsonNode, IDictionary<string, JsonNode>
+	public sealed class JsonObject : JsonNode, IEnumerable<KeyValuePair<JsonString, JsonNode>>
 	{
-		Dictionary<string, JsonNode> members;
-
 		public override JsonNodeType NodeType => JsonNodeType.Object;
 
-		public ICollection<string> Keys => members.Keys;
-
-		public ICollection<JsonNode> Values => members.Values;
+		List<KeyValuePair<JsonString, JsonNode>> members;
 
 		public int Count => members.Count;
 
-		public bool IsReadOnly => true;
-
-		JsonNode IDictionary<string, JsonNode>.this[string key]
-		{
-			get => this[key];
-			set => throw new NotSupportedException();
-		}
-
-		internal JsonObject(Dictionary<string, JsonNode> members)
-		{
-			this.members = members;
-		}
-
 		internal JsonObject()
 		{
-			this.members = new Dictionary<string, JsonNode>(StringComparer.Ordinal);
+			this.members = new List<KeyValuePair<JsonString, JsonNode>>();
 		}
 
-		public JsonNode this[string key]
+		internal void Add(JsonString name, JsonNode value)
 		{
-			get
-			{
-				return this.members.TryGetValue(key, out JsonNode node) ? node : null;
-			}
+			this.members.Add(new(name, value));
 		}
 
-		internal void Add(string name, JsonNode value)
-		{
-			this.members.Add(name, value);
-		}
-
-		void IDictionary<string, JsonNode>.Add(string key, JsonNode value)
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool ContainsKey(string key)
-		{
-			return this.members.ContainsKey(key);
-		}
-
-		public bool Remove(string key)
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool TryGetValue(string key, out JsonNode value)
-		{
-			return this.members.TryGetValue(key, out value);
-		}
-
-		public void Add(KeyValuePair<string, JsonNode> item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void Clear()
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool Contains(KeyValuePair<string, JsonNode> item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void CopyTo(KeyValuePair<string, JsonNode>[] array, int arrayIndex)
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool Remove(KeyValuePair<string, JsonNode> item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public IEnumerator<KeyValuePair<string, JsonNode>> GetEnumerator()
+		public IEnumerator<KeyValuePair<JsonString, JsonNode>> GetEnumerator()
 		{
 			return this.members.GetEnumerator();
 		}
@@ -283,8 +219,10 @@ namespace Sylvan.BuildTools.Resources
 
 		public int IndexOf(JsonNode item)
 		{
-			for (int i = 0; i < this.count; i++) {
-				if (this[i].Equals(item)) {
+			for (int i = 0; i < this.count; i++)
+			{
+				if (this[i].Equals(item))
+				{
 					return i;
 				}
 			}
@@ -347,6 +285,11 @@ namespace Sylvan.BuildTools.Resources
 		}
 
 		public override JsonNodeType NodeType => JsonNodeType.String;
+
+		public override string ToString()
+		{
+			return "JsonString:" + Value;
+		}
 	}
 
 	public sealed class JsonNumber : JsonNode
@@ -381,6 +324,11 @@ namespace Sylvan.BuildTools.Resources
 		}
 
 		public override JsonNodeType NodeType => JsonNodeType.Boolean;
+
+		public override string ToString()
+		{
+			return "JsonBoolean:" + value;
+		}
 	}
 
 	public sealed class JsonNull : JsonNode
