@@ -3,7 +3,9 @@
 		<CodeGenTestRoot>../../../../../Sylvan.BuildTools.Resources/bin/Debug/netstandard1.6/build/</CodeGenTestRoot>
 		<SylvanResourceTaskAssembly>../Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
 		<OutputType>Exe</OutputType>
-	</PropertyGroup>
+
+	  <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
 
 	<Import Project="$(CodeGenTestRoot)Sylvan.BuildTools.Resources.props"/>
 </Project>
