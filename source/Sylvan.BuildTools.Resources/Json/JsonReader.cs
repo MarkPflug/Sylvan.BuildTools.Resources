@@ -349,6 +349,8 @@ namespace Sylvan.BuildTools.Resources
 						return true;
 					case TokenKind.Name:
 						SyntaxKind = tokenizer.GetValueSyntaxKind();
+						// only expecting true|false|null.
+						// any other unquoted string (name) is an error.
 						if (SyntaxKind == SyntaxKind.StringValue)
 						{
 							HandleError(JsonErrorCode.ExpectedPropertyValue, tokenizer.Start);
