@@ -92,6 +92,10 @@ The generated code is compiled into the project assembly, but is not included in
 
 ## Release Notes:
 
+_0.6.1_
+- Adds `PreProcess` capability to StaticResourceFolder. 
+- Improves error reporting for some malformed JSON scenarios.
+
 _0.6.0_
  - Adds support for generating static code from a folder holding static resources (non-localizable).
 
