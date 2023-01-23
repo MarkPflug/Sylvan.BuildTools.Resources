@@ -16,6 +16,7 @@
 		ExpectedObjectMember,
 		ExpectedColon,
 		UnexpectedToken,
-		UnterminatedString
+		UnterminatedString,
+		ExpectedPropertyValue
 	}
 }

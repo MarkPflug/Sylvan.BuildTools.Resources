@@ -93,9 +93,9 @@ namespace Sylvan.BuildTools.Resources
 
 		void HandleError(JsonErrorCode code)
 		{
-			if (!this.errorHandler(code, tokenizer.Location))
+			if (!this.errorHandler(code, tokenizer.Start))
 			{
-				throw new JsonParseException(code, tokenizer.Location);
+				throw new JsonParseException(code, tokenizer.Start);
 			}
 		}
 
@@ -165,9 +165,9 @@ namespace Sylvan.BuildTools.Resources
 			{
 				switch (this.tokenizer.TokenKind)
 				{
-				case TokenKind.Name:
-					throw new NotImplementedException();
 				case TokenKind.String:
+					return tokenizer.GetString();
+				case TokenKind.Name:
 					return tokenizer.GetString();
 				default:
 					throw new InvalidOperationException();
@@ -189,7 +189,7 @@ namespace Sylvan.BuildTools.Resources
 			throw new NotImplementedException();
 		}
 
-		public string PropertyName
+		public JsonString PropertyName
 		{
 			get
 			{
@@ -199,7 +199,10 @@ namespace Sylvan.BuildTools.Resources
 				{
 				case TokenKind.Name:
 				case TokenKind.String:
-					return tokenizer.GetString();
+					var str = new JsonString(tokenizer.GetString());
+					str.Start = tokenizer.Start;
+					str.End = tokenizer.End;
+					return str;
 				default:
 					throw new InvalidOperationException();
 				}
@@ -243,10 +246,10 @@ namespace Sylvan.BuildTools.Resources
 		public bool Read()
 		{
 			this.lastEnd = tokenizer.End;
-			start:
+		start:
 			if (tokenizer.NextToken())
 			{
-				next:
+			next:
 				var token = tokenizer.TokenKind;
 				// this will be assigned to something else before we return, 
 				// unless we exit with an error condition.
@@ -346,6 +349,10 @@ namespace Sylvan.BuildTools.Resources
 						return true;
 					case TokenKind.Name:
 						SyntaxKind = tokenizer.GetValueSyntaxKind();
+						if (SyntaxKind == SyntaxKind.StringValue)
+						{
+							HandleError(JsonErrorCode.ExpectedPropertyValue, tokenizer.Start);
+						}
 						return true;
 					case TokenKind.String:
 						SyntaxKind = SyntaxKind.StringValue;

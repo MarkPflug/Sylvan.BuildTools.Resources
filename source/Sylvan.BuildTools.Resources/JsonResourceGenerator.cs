@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace Sylvan.BuildTools.Resources
@@ -21,7 +22,7 @@ namespace Sylvan.BuildTools.Resources
 	{
 		[Required]
 		// The folder where we will write all of our generated code.
-		public String OutputPath { get; set; }
+		public string OutputPath { get; set; }
 
 		// All of the .resj files in our projct.
 		public ITaskItem[] InputFiles { get; set; }
@@ -50,7 +51,7 @@ namespace Sylvan.BuildTools.Resources
 			public bool JsonError(JsonErrorCode error, Location loc)
 			{
 				task.hasError = true;
-				task.Log.LogError(null, "JP" + ((int) error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
+				task.Log.LogError(null, "JP" + ((int)error).ToString(), null, file, loc.Line, loc.Column, loc.Line, loc.Column, error.ToString(), null);
 				return true;
 			}
 
@@ -121,7 +122,7 @@ namespace Sylvan.BuildTools.Resources
 					continue;
 				}
 
-				var root = (JsonObject) doc.RootNode;
+				var root = (JsonObject)doc.RootNode;
 
 				var resName = iFile.GetMetadata("ResourceName");
 
@@ -201,27 +202,37 @@ namespace Sylvan.BuildTools.Resources
     }}
 ");
 
-							foreach (var section in root.Keys)
+							foreach (var section in root)
 							{
-								var value = root[section];
+								var value = section.Value;
+								var sectionName = section.Key.Value;
 
-								switch (section)
+								switch (sectionName)
 								{
 									case "Strings":
 									case "Files":
 										if (value.NodeType == JsonNodeType.Object)
 										{
-											var obj = (JsonObject) value;
+											var obj = (JsonObject)value;
 											foreach (var item in obj)
 											{
+												var identifier = item.Key.Value;
+
+												if (!Regex.IsMatch(identifier, @"^\w(\w|\d)*$"))
+												{
+													logger.ParseError("Resource key must be valid C# identifier.", item.Key);
+													// don't emit any broken code.
+													continue;
+												}
+
 												string comment = null;
-												if (section == "Strings")
+												if (sectionName == "Strings")
 												{
 													// https://stackoverflow.com/a/19498780
 													string stringValue = new XText(((JsonString)item.Value).Value).ToString();
 													comment = $"Looks up a localized string similar to {stringValue.Substring(0, Math.Min(stringValue.Length, 100))}";
 												}
-												else if (section == "Files")
+												else if (sectionName == "Files")
 												{
 													comment = $"Looks up a {item.Key} text file";
 												}
@@ -236,11 +247,11 @@ namespace Sylvan.BuildTools.Resources
 												}
 
 												w.Write($@"
-    public static string {item.Key}
+    public static string {item.Key.Value}
     {{
         get
         {{
-            return ResourceManager.GetString(""{item.Key}"", resourceCulture);
+            return ResourceManager.GetString(""{item.Key.Value}"", resourceCulture);
         }}
     }}
 ");
@@ -269,7 +280,6 @@ namespace Sylvan.BuildTools.Resources
 					}
 				}
 
-
 				// prepare the generated files we are about to write.
 				var resFile = Path.Combine(OutputPath, resourceName);
 
@@ -286,20 +296,16 @@ namespace Sylvan.BuildTools.Resources
 				{
 					resItem.SetMetadata("Culture", culturePart);
 				}
-				else
-				{
-
-				}
 
 				json = new JsonReader(new StringReader(text), logger.JsonError);
 				using (var rw = new System.Resources.ResourceWriter(resFile))
 				{
-
-					foreach (var section in root.Keys)
+					foreach (var section in root)
 					{
-						var sectionNode = root[section];
+						var sectionName = section.Key.Value;
+						var sectionNode = section.Value;
 						var isFile = false;
-						switch (section)
+						switch (sectionName)
 						{
 							case "Strings":
 								isFile = false;
@@ -317,12 +323,12 @@ namespace Sylvan.BuildTools.Resources
 							logger.ParseError("Expected json object", sectionNode);
 							continue;
 						}
-						var sectionObj = (JsonObject) sectionNode;
+						var sectionObj = (JsonObject)sectionNode;
 
 
-						foreach (var key in sectionObj.Keys)
+						foreach (var item in sectionObj)
 						{
-							var str = sectionObj[key];
+							var str = item.Value;
 
 							if (str.NodeType != JsonNodeType.String)
 							{
@@ -330,7 +336,7 @@ namespace Sylvan.BuildTools.Resources
 								continue;
 							}
 
-							var strVal = (JsonString) str;
+							var strVal = (JsonString)str;
 
 							string txt;
 							if (isFile)
@@ -361,7 +367,7 @@ namespace Sylvan.BuildTools.Resources
 							}
 
 							// write our string to the resources binary
-							rw.AddResource(key, txt);
+							rw.AddResource(item.Key.Value, txt);
 						}
 					}
 				}
@@ -374,4 +380,3 @@ namespace Sylvan.BuildTools.Resources
 		}
 	}
 }
-
