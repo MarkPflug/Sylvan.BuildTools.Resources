@@ -92,6 +92,9 @@ The generated code is compiled into the project assembly, but is not included in
 
 ## Release Notes:
 
+_0.6.2_
+- Fixes StaticResourceFolder handling of empty folders (#23).
+
 _0.6.1_
 - Adds `PreProcess` capability to StaticResourceFolder. 
 - Improves error reporting for some malformed JSON scenarios.

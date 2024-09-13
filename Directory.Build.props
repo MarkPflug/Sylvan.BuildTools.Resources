@@ -6,10 +6,10 @@
     <Authors>$(Owner)</Authors>
     <PackageIconUrl>https://markpflug.github.io/Sylvan.png</PackageIconUrl>
     <PackageIcon>Sylvan.png</PackageIcon>
-	<Year>2022</Year>
+	<Year>2024</Year>
     <Copyright>© $(Year) $(Owner)</Copyright>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>12</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors>CS1030;CA1835;$(WarningsNotAsErrors)</WarningsNotAsErrors>
 
@@ -19,8 +19,6 @@
     <DeterministicSourcePaths>true</DeterministicSourcePaths>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests')) == 'true'">true</IsTestProject>
-
 	<ReadmeFile>$(MSBuildThisFileDirectory)readme.md</ReadmeFile>
 	<PackageReadmeFile
 		Condition="Exists($(ReadmeFile))">readme.md</PackageReadmeFile>
@@ -38,10 +36,5 @@
 	  Pack="true"
 	  PackagePath=""/>
   </ItemGroup>
-
-	<PropertyGroup Condition="$(IsTestProject) == true">
-		<NoWarn>xunit2013</NoWarn>
-	</PropertyGroup>
-    
 
 </Project>

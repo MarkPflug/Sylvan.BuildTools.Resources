@@ -88,8 +88,15 @@ namespace Sylvan.BuildTools.Resources
 			return !hasError;
 		}
 
+		const int MaxDepth = 16; // more than enough
+
 		void WriteClass(TextWriter w, string folder, bool isPublic, int depth = 0)
 		{
+			if (depth >= MaxDepth)
+			{
+				w.Write($"#warning Maximum nesting depth of {MaxDepth} exceeded.");
+				return;
+			}
 
 			var className = Path.GetFileNameWithoutExtension(folder);
 			className = IdentifierStyle.PascalCase.Convert(className);
@@ -141,10 +148,11 @@ namespace Sylvan.BuildTools.Resources
     public static readonly string {name} = Process(""{str}"");
 ");
 
-				foreach(var child in Directory.EnumerateDirectories(folder))
-				{
-					WriteClass(w, child, isPublic, depth + 1);
-				}
+			}
+
+			foreach(var child in Directory.EnumerateDirectories(folder))
+			{
+				WriteClass(w, child, isPublic, depth + 1);
 			}
 
 			w.WriteLine("}");

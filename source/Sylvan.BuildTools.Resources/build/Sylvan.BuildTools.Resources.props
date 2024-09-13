@@ -3,7 +3,7 @@
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
-		<SylvanResourceTaskAssembly Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard1.6/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
+		<SylvanResourceTaskAssembly Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard2.0/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
 	</PropertyGroup>
 
 	<ItemDefinitionGroup>

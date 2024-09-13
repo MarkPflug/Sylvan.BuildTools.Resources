@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <VersionPrefix>0.6.1</VersionPrefix>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <VersionPrefix>0.6.2</VersionPrefix>
 
     <Title>Sylvan Json Resource</Title>
     <Summary>Sylvan Json Resource provides a Json based alternative to resx resource files.</Summary>
@@ -15,6 +15,7 @@
 	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 	<DevelopmentDependency>true</DevelopmentDependency>
 
+	  <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1903</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
