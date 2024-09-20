@@ -13,18 +13,13 @@ namespace Sylvan.BuildTools;
 
 class MsBuildFixture : IDisposable
 {
-	// force a reference to ImmutableArray which causes load issues
-	// when some subsequent MSBuild assembly loads.
-#pragma warning disable IDE0052 // Remove unread private members
-#pragma warning disable CS0414
-	static readonly ImmutableArray<int> hack = new ImmutableArray<int>();
-#pragma warning restore CS0414
-#pragma warning restore IDE0052 // Remove unread private members
+	VisualStudioInstance instance;
 
 	public MsBuildFixture()
 	{
-		var inst = MSBuildLocator.RegisterDefaults();
+		this.instance = MSBuildLocator.RegisterDefaults();
 	}
+
 
 	public void Dispose()
 	{
