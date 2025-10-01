@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>Sylvan.BuildTools.Resources</RootNamespace>
-		<WarningsNotAsErrors>NU1902;NU1904</WarningsNotAsErrors>
+		<WarningsNotAsErrors>NU1902;NU1904;NU1510;NU1903</WarningsNotAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,7 +17,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 				
 		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+		<!--<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />-->
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="xunit" />

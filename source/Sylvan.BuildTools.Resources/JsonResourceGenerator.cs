@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Sylvan.Json;
 
 namespace Sylvan.BuildTools.Resources
 {
