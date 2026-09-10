@@ -2,87 +2,87 @@
 <Project
 	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
-	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="StaticResourceGenerator"/>
-	<UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="DetermineNamespace"/>
+  <UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="JsonResourceGenerator"/>
+  <UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="StaticResourceGenerator"/>
+  <UsingTask AssemblyFile="$(SylvanResourceTaskAssembly)" TaskName="DetermineNamespace"/>
 
-	<ItemGroup>
-		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.xaml" />
-		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.ContentType.xaml" />
-		<AvailableItemName Include="JsonResource"/>
-	</ItemGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.xaml" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Sylvan.BuildTools.Resources.ContentType.xaml" />
+    <AvailableItemName Include="JsonResource"/>
+  </ItemGroup>
 
-	<PropertyGroup>
+  <PropertyGroup>
 
-		<CoreCompileDependsOn>
-			GenerateJsonResource;
-			GenerateStaticResource;
-			$(CoreCompileDependsOn)
-		</CoreCompileDependsOn>
+    <CoreCompileDependsOn>
+      GenerateJsonResource;
+      GenerateStaticResource;
+      $(CoreCompileDependsOn)
+    </CoreCompileDependsOn>
 
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<ItemGroup>
+  <ItemGroup>
 
-		<StaticResourceFiles
-			Include="%(StaticResourceFolder)/**/*"/>
-	</ItemGroup>
+    <StaticResourceFiles
+      Include="%(StaticResourceFolder)/**/*"/>
+  </ItemGroup>
 
-	<Target
-		Name="GenerateJsonResource"
-		BeforeTargets="BeforeBuild"
-		Condition="'@(JsonResource)' != ''"
-	>
-		<PropertyGroup>
-			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>
-		</PropertyGroup>
+  <Target
+    Name="GenerateJsonResource"
+    BeforeTargets="BeforeBuild"
+    Condition="'@(JsonResource)' != ''"
+  >
+    <PropertyGroup>
+      <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>
+    </PropertyGroup>
 
-		<ItemGroup>
-			<JsonResourceTemp Include="@(JsonResource)"/>
-			<JsonResource Remove="@(JsonResource)"/>
-		</ItemGroup>
+    <ItemGroup>
+      <JsonResourceTemp Include="@(JsonResource)"/>
+      <JsonResource Remove="@(JsonResource)"/>
+    </ItemGroup>
 
-		<DetermineNamespace
-			Items="@(JsonResourceTemp)"
-			NamespaceRoot="$(RootNamespace)">
-			<Output TaskParameter="Output"
-				ItemName="JsonResource"/>
-		</DetermineNamespace>
+    <DetermineNamespace
+      Items="@(JsonResourceTemp)"
+      NamespaceRoot="$(RootNamespace)">
+      <Output TaskParameter="Output"
+        ItemName="JsonResource"/>
+    </DetermineNamespace>
 
-		<JsonResourceGenerator
-			OutputPath="$(CodeGenerationRoot)"
-			InputFiles="@(JsonResource)"
-		>
-			<Output TaskParameter="OutputCode" ItemName="ResourceCodeFile"/>
-			<Output TaskParameter="OutputResources" ItemName="ResourceResFile"/>
-		</JsonResourceGenerator>
+    <JsonResourceGenerator
+      OutputPath="$(CodeGenerationRoot)"
+      InputFiles="@(JsonResource)"
+    >
+      <Output TaskParameter="OutputCode" ItemName="ResourceCodeFile"/>
+      <Output TaskParameter="OutputResources" ItemName="ResourceResFile"/>
+    </JsonResourceGenerator>
 
-		<ItemGroup>
-			<Compile Include="@(ResourceCodeFile)"/>
-			<EmbeddedResource Include="@(ResourceResFile)"/>
-		</ItemGroup>
-	</Target>
+    <ItemGroup>
+      <Compile Include="@(ResourceCodeFile)"/>
+      <EmbeddedResource Include="@(ResourceResFile)"/>
+    </ItemGroup>
+  </Target>
 
-	<Target
-		Name="GenerateStaticResource"
-		BeforeTargets="BeforeBuild"
-		Condition="'@(StaticResourceFolder)' != ''"
-	>
+  <Target
+    Name="GenerateStaticResource"
+    BeforeTargets="BeforeBuild"
+    Condition="'@(StaticResourceFolder)' != ''"
+  >
 
-		<PropertyGroup>
-			<CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanStaticResources</CodeGenerationRoot>
-		</PropertyGroup>
+    <PropertyGroup>
+      <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanStaticResources</CodeGenerationRoot>
+    </PropertyGroup>
 
-		<StaticResourceGenerator
-			OutputPath="$(CodeGenerationRoot)"
-			InputFolders="@(StaticResourceFolder)"
-			Namespace="$(RootNamespace)"
-		>
-			<Output TaskParameter="OutputCode" ItemName="StaticResourceCodeFile"/>
-		</StaticResourceGenerator>
+    <StaticResourceGenerator
+      OutputPath="$(CodeGenerationRoot)"
+      InputFolders="@(StaticResourceFolder)"
+      Namespace="$(RootNamespace)"
+    >
+      <Output TaskParameter="OutputCode" ItemName="StaticResourceCodeFile"/>
+    </StaticResourceGenerator>
 
-		<ItemGroup>
-			<Compile Include="@(StaticResourceCodeFile)"/>
-		</ItemGroup>
-	</Target>
+    <ItemGroup>
+      <Compile Include="@(StaticResourceCodeFile)"/>
+    </ItemGroup>
+  </Target>
 </Project>

@@ -22,8 +22,9 @@ csharp_indent_case_contents = true
 csharp_indent_switch_labels = false
 
 
-[*.{targets,props}]
-indent_style                      = tab
+[*.{targets,props,csproj,xaml}]
+indent_style = space
+indent_size = 2
 
 
 [*.{cs,vb}]

@@ -2,21 +2,15 @@
   <PropertyGroup>
     <PackageTags>$(PackageTags);.NET;Sylvan</PackageTags>
   </PropertyGroup>
-  
+
   <Target Name="PrepareNupkg" BeforeTargets="ResolvePackageAssets">
     <!-- the package folder must exist before nuget restore runs -->
     <MakeDir Condition="!Exists($(PackageOutputPath))" Directories="$(PackageOutputPath)" />
   </Target>
 
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Git" Version="8.0.0" PrivateAssets="All"/>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>  
-  </ItemGroup>
-  
-   <Target
-     Condition="$(VersionSuffix) == ''"
-     Name="PackValidations" BeforeTargets="GenerateNuspec">
+  <Target
+    Condition="$(VersionSuffix) == ''"
+    Name="PackValidations" BeforeTargets="GenerateNuspec">
     <!-- 
     Attempt to prevent myself from accidentally releasing a debug build.
     These checks are disabled for pre-release builds.

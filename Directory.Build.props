@@ -1,40 +1,36 @@
 <Project>
-  <PropertyGroup>
-    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)packages\</PackageOutputPath>
-    <Owner>Mark Pflug</Owner>
-    <Authors>$(Owner)</Authors>
-    <PackageIconUrl>https://markpflug.github.io/Sylvan.png</PackageIconUrl>
-    <PackageIcon>Sylvan.png</PackageIcon>
-	<Year>2024</Year>
-    <Copyright>© $(Year) $(Owner)</Copyright>
-    <PackageLicenseFile>license.txt</PackageLicenseFile>
-    <LangVersion>12</LangVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS1030;CA1835;$(WarningsNotAsErrors)</WarningsNotAsErrors>
+   <PropertyGroup>
+      <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+      <PackageOutputPath>$(MSBuildThisFileDirectory)packages\</PackageOutputPath>
+      <Owner>Mark Pflug</Owner>
+      <Authors>$(Owner)</Authors>
+      <PackageIconUrl>https://markpflug.github.io/Sylvan.png</PackageIconUrl>
+      <PackageIcon>Sylvan.png</PackageIcon>
+      <Year>2024</Year>
+      <Copyright>© $(Year) $(Owner)</Copyright>
+      <PackageLicenseFile>license.txt</PackageLicenseFile>
+      <LangVersion>12</LangVersion>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsNotAsErrors>CS1030;CA1835;$(WarningsNotAsErrors)</WarningsNotAsErrors>
 
-    <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
-	<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-	<RepositoryType>git</RepositoryType>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    
-	<ReadmeFile>$(MSBuildThisFileDirectory)readme.md</ReadmeFile>
-	<PackageReadmeFile
-		Condition="Exists($(ReadmeFile))">readme.md</PackageReadmeFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)license.txt" Pack="true" PackagePath="">
-      <Visible>false</Visible>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)Sylvan.png" Pack="true" PackagePath="">
-      <Visible>false</Visible>
-    </None>
-	<None
-	  Condition="Exists($(ReadmeFile))"
-	  Include="$(ReadmeFile)"
-	  Pack="true"
-	  PackagePath=""/>
-  </ItemGroup>
+      <RepositoryUrl>https://github.com/MarkPflug/Sylvan.BuildTools.Resources</RepositoryUrl>
+      <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+      <RepositoryType>git</RepositoryType>
+      <DeterministicSourcePaths>true</DeterministicSourcePaths>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+      <ReadmeFile>$(MSBuildThisFileDirectory)readme.md</ReadmeFile>
+      <PackageReadmeFile
+         Condition="Exists($(ReadmeFile))">readme.md</PackageReadmeFile>
+   </PropertyGroup>
+   <ItemGroup>
+      <None Include="$(MSBuildThisFileDirectory)license.txt" Pack="true" PackagePath="">
+         <Visible>false</Visible>
+      </None>
+      <None Include="$(MSBuildThisFileDirectory)Sylvan.png" Pack="true" PackagePath="">
+         <Visible>false</Visible>
+      </None>
+
+   </ItemGroup>
 
 </Project>

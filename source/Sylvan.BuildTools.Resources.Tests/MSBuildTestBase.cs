@@ -3,7 +3,6 @@ using Microsoft.Build.Locator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Xunit;
@@ -17,9 +16,10 @@ class MsBuildFixture : IDisposable
 
 	public MsBuildFixture()
 	{
-		this.instance = MSBuildLocator.RegisterDefaults();
+		var instances = MSBuildLocator.QueryVisualStudioInstances();
+		instance = instances.First(i => i.Version.Major == Environment.Version.Major);
+		MSBuildLocator.RegisterInstance(instance);
 	}
-
 
 	public void Dispose()
 	{

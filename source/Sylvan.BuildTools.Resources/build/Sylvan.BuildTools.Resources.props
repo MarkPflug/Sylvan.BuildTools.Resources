@@ -1,26 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project
-	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<PropertyGroup>
-		<SylvanResourceTaskAssembly Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard2.0/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
-	</PropertyGroup>
+  <PropertyGroup>
+    <SylvanResourceTaskAssembly 
+      Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard2.0/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
+  </PropertyGroup>
 
-	<ItemDefinitionGroup>
-		<JsonResource>
-			<Generator>MSBuild:GenerateJsonResource</Generator>
-		</JsonResource>
-		<StaticResourceFiles>
-			<Generator>MSBuild:GenerateStaticResource</Generator>
-		</StaticResourceFiles>
-	</ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <JsonResource>
+      <Generator>MSBuild:GenerateJsonResource</Generator>
+    </JsonResource>
+    <StaticResourceFiles>
+      <Generator>MSBuild:GenerateStaticResource</Generator>
+    </StaticResourceFiles>
+  </ItemDefinitionGroup>
 
-	<ItemGroup>
-		<None Remove="**/*.resj"/>
-		<JsonResource Include="**/*.resj"/>
-		
-		<StaticResourceFiles 
-			Include="%(StaticResourceFolder.Identity)/**/*"/>
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**/*.resj"/>
+    <JsonResource Include="**/*.resj"/>
+
+    <StaticResourceFiles
+      Include="%(StaticResourceFolder.Identity)/**/*"/>
+  </ItemGroup>
 
 </Project>

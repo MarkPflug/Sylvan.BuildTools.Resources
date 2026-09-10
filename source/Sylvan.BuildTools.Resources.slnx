@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path="../.editorconfig" />
+    <File Path="../Directory.Build.props" />
+    <File Path="../Directory.Build.targets" />
+    <File Path="../README.md" />
+  </Folder>
+  <Project Path="Sylvan.BuildTools.Resources.Tests/Sylvan.BuildToolsResources.Tests.csproj" />
+  <Project Path="Sylvan.BuildTools.Resources/Sylvan.BuildTools.Resources.csproj" />
+</Solution>
