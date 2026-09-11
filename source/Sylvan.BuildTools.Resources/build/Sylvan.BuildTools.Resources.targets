@@ -19,7 +19,8 @@
       GenerateStaticResource;
       $(CoreCompileDependsOn)
     </CoreCompileDependsOn>
-
+    
+ 
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,9 +34,19 @@
     BeforeTargets="BeforeBuild"
     Condition="'@(JsonResource)' != ''"
   >
-    <PropertyGroup>
-      <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>
-    </PropertyGroup>
+
+    <Message 
+      Importance="high"              
+      Text="AAA"/>
+    <Message 
+      Importance="high"
+      Text="@(JsonResourceCode)"/>
+    <Message 
+      Importance="high"
+      Text="@(JsonResourceRes)"/>
+    <Message
+      Importance="high"
+      Text="@(JsonResource)"/>
 
     <ItemGroup>
       <JsonResourceTemp Include="@(JsonResource)"/>
@@ -61,12 +72,16 @@
       <Compile Include="@(ResourceCodeFile)"/>
       <EmbeddedResource Include="@(ResourceResFile)"/>
     </ItemGroup>
+    
+ 
   </Target>
 
   <Target
     Name="GenerateStaticResource"
     BeforeTargets="BeforeBuild"
     Condition="'@(StaticResourceFolder)' != ''"
+    Inputs="@(StaticResourceFiles)"
+    Outputs="$(StaticResourceMarker)"
   >
 
     <PropertyGroup>
@@ -84,5 +99,9 @@
     <ItemGroup>
       <Compile Include="@(StaticResourceCodeFile)"/>
     </ItemGroup>
+    <Touch 
+      Files="$(StaticResourceMarker)"
+      AlwaysCreate="true" 
+    />
   </Target>
 </Project>

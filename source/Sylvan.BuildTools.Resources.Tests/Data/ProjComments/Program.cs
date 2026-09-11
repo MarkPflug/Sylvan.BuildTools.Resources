@@ -6,6 +6,6 @@
         var culture = System.Globalization.CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
         System.Threading.Thread.CurrentThread.CurrentCulture = culture;
         System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
-        System.Console.WriteLine(Proj.Strings.Message);
+        System.Console.Write(Proj.Strings.Message);
     }
 }

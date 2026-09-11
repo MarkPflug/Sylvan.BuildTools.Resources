@@ -11,36 +11,43 @@ public class JsonResourceGeneratorTests : MSBuildTestBase
 	public void BuildCommentsTest()
 	{
 		var exepath = BuildProject("Data/ProjComments/Proj.csproj");
-		Assert.Equal($"Hello, World{Environment.NewLine}", GetOutput(exepath, ""));
+		Assert.Equal($"Hello, World", GetOutput(exepath, ""));
+	}
+
+	[Fact]
+	public void HeirarchyTest()
+	{
+		var exepath = BuildProject("Data/Heirarchy/Proj.csproj");
+		Assert.Equal($"Root A A/B", GetOutput(exepath, ""));
 	}
 
 	[Fact]
 	public void BuildTest()
 	{
 		var exepath = BuildProject("Data/Proj1/Proj.csproj");
-		Assert.Equal($"Hello, World{Environment.NewLine}", GetOutput(exepath, ""));
+		Assert.Equal($"Hello, World", GetOutput(exepath, ""));
 	}
 
 	[Fact]
 	public void BuildTest2()
 	{
 		var exepath = BuildProject("Data/Proj2/Proj.csproj");
-		Assert.Equal($"Hello, World{Environment.NewLine}", GetOutput(exepath, ""));
-		Assert.Equal($"Hallo, Welt{Environment.NewLine}", GetOutput(exepath, "de-DE"));
+		Assert.Equal($"en-US Hello, World", GetOutput(exepath, ""));
+		Assert.Equal($"Hallo, Welt", GetOutput(exepath, "de-DE"));
 	}
 
 	[Fact]
 	public void BuildTestNetCore()
 	{
 		var exepath = BuildProject("Data/Proj3/Proj.csproj");
-		Assert.Equal($"Hello, World{Environment.NewLine}", GetOutput(exepath, ""));
-		Assert.Equal($"Hallo, Welt{Environment.NewLine}", GetOutput(exepath, "de-DE"));
+		Assert.Equal($"Hello, World", GetOutput(exepath, ""));
+		Assert.Equal($"Hallo, Welt", GetOutput(exepath, "de-DE"));
 	}
 
 	[Fact]
 	public void BuildTestNamespace()
 	{
 		var exepath = BuildProject("Data/ProjNS/Proj.csproj");
-		Assert.Equal($"Hello, World{Environment.NewLine}", GetOutput(exepath, ""));
+		Assert.Equal($"Hello, World", GetOutput(exepath, ""));
 	}
 }

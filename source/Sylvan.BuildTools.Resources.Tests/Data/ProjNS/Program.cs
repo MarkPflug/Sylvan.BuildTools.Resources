@@ -8,7 +8,7 @@ class Program
 		var culture = System.Globalization.CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
 		System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 		System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
-		System.Console.WriteLine(Strings.Message);
+		System.Console.Write(Strings.Message);
 		var a = CustomNS.Custom.Message;
 	}
 }
