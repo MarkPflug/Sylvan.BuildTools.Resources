@@ -6,10 +6,7 @@
     <SylvanResourceTaskAssembly 
       Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard2.0/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
 
-    <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>
-    <StaticResourceMarker>$(CodeGenerationRoot)/StaticResourceMarker</StaticResourceMarker>
-
-    
+    <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>    
   </PropertyGroup>
 
   <ItemDefinitionGroup>

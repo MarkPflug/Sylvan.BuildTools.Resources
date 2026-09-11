@@ -18,8 +18,7 @@
       GenerateJsonResource;
       GenerateStaticResource;
       $(CoreCompileDependsOn)
-    </CoreCompileDependsOn>
-    
+    </CoreCompileDependsOn>    
  
   </PropertyGroup>
 
@@ -80,8 +79,6 @@
     Name="GenerateStaticResource"
     BeforeTargets="BeforeBuild"
     Condition="'@(StaticResourceFolder)' != ''"
-    Inputs="@(StaticResourceFiles)"
-    Outputs="$(StaticResourceMarker)"
   >
 
     <PropertyGroup>
@@ -99,9 +96,6 @@
     <ItemGroup>
       <Compile Include="@(StaticResourceCodeFile)"/>
     </ItemGroup>
-    <Touch 
-      Files="$(StaticResourceMarker)"
-      AlwaysCreate="true" 
-    />
+    
   </Target>
 </Project>
