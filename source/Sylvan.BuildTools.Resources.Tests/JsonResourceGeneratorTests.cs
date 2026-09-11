@@ -10,6 +10,7 @@ public class JsonResourceGeneratorTests : MSBuildTestBase
 	[Fact]
 	public void BuildCommentsTest()
 	{
+		
 		var exepath = BuildProject("Data/ProjComments/Proj.csproj");
 		Assert.Equal($"Hello, World", GetOutput(exepath, ""));
 	}
@@ -33,7 +34,7 @@ public class JsonResourceGeneratorTests : MSBuildTestBase
 	{
 		var exepath = BuildProject("Data/Proj2/Proj.csproj");
 		Assert.Equal($"en-US Hello, World", GetOutput(exepath, ""));
-		Assert.Equal($"Hallo, Welt", GetOutput(exepath, "de-DE"));
+		Assert.Equal($"de-DE Hallo, Welt", GetOutput(exepath, "de-DE"));
 	}
 
 	[Fact]

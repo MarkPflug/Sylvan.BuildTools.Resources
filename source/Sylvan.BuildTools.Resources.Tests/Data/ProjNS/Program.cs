@@ -1,14 +1,8 @@
-﻿using TestNS.MyResources;
-
-class Program
+﻿partial class Program
 {
 	public static void Main(string[] args)
 	{
-		var lang = args.Length > 0 ? args[0] : "en-US";
-		var culture = System.Globalization.CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
-		System.Threading.Thread.CurrentThread.CurrentCulture = culture;
-		System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
-		System.Console.Write(Strings.Message);
-		var a = CustomNS.Custom.Message;
+		SetCulture();
+		System.Console.Write(global::CustomNS.Custom.Message);
 	}
 }

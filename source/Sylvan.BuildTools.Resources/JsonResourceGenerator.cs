@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Sylvan.Json;
+using System.Globalization;
 
 namespace Sylvan.BuildTools.Resources;
 
@@ -126,7 +127,6 @@ public class JsonResourceGenerator : Task
 			var root = (JsonObject)doc.RootNode;
 
 			var resName = iFile.GetMetadata("ResourceName");
-			var relDir = iFile.GetMetadata("RelativeDir");
 			var ns = iFile.GetMetadata("Namespace");
 
 			// prepare the generated files we are about to write.
@@ -135,10 +135,13 @@ public class JsonResourceGenerator : Task
 				resName = Path.GetFileNameWithoutExtension(iFile.ItemSpec);
 			}
 
+			if (!string.IsNullOrEmpty(ns))
+			{
+				resName = ns + '.' + resName;
+			}
+
 			var resourceName = resName + ".resources";
-			var relPath = Path.Combine(relDir, resourceName);
-			var rn = relPath.Replace("\\", "_");
-			var resFile = Path.Combine(OutputPath, relPath);
+			var resFile = Path.Combine(OutputPath, resourceName);
 
 
 			Directory.CreateDirectory(OutputPath);
@@ -189,7 +192,7 @@ public class JsonResourceGenerator : Task
         {{
             if (object.ReferenceEquals(rm, null))
             {{
-                rm = new global::System.Resources.ResourceManager(""{rn}"", typeof({className}).GetTypeInfo().Assembly);
+                rm = new global::System.Resources.ResourceManager(""{resName}"", typeof({className}).GetTypeInfo().Assembly);
             }}
 
             return rm;
@@ -289,16 +292,14 @@ public class JsonResourceGenerator : Task
 
 
 			var resItem = new TaskItem(resFile);
-			resItem.SetMetadata("LogicalName", rn + ".resources");
-			resItem.SetMetadata("ManifestResourceName", rn);
-			resItem.SetMetadata("OutputResource", resourceName);
-
+			resItem.SetMetadata("LogicalName", resName + ".resources");
+			
 			resItem.SetMetadata("WithCulture", hasCulture ? "true" : "false");
 			resItem.SetMetadata("Type", "Non-Resx");
 
 			outResItems.Add(resItem);
 			if (hasCulture)
-			{
+			{	
 				resItem.SetMetadata("Culture", culturePart);
 			}
 

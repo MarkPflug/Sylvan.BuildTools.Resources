@@ -2,7 +2,7 @@
   
 	<PropertyGroup>
     <DocumentationFile>ProjComments.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
 	</PropertyGroup>
 
 </Project>

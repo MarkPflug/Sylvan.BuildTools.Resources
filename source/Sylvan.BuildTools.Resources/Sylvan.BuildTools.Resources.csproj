@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <VersionPrefix>0.6.7</VersionPrefix>
+    <VersionPrefix>0.6.5</VersionPrefix>
 
     <Title>Sylvan Json Resource</Title>
     <Summary>Sylvan Json Resource provides a Json based alternative to resx resource files.</Summary>
