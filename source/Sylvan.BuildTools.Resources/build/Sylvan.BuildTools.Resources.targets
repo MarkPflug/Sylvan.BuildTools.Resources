@@ -34,19 +34,6 @@
     Condition="'@(JsonResource)' != ''"
   >
 
-    <Message 
-      Importance="high"              
-      Text="AAA"/>
-    <Message 
-      Importance="high"
-      Text="@(JsonResourceCode)"/>
-    <Message 
-      Importance="high"
-      Text="@(JsonResourceRes)"/>
-    <Message
-      Importance="high"
-      Text="@(JsonResource)"/>
-
     <ItemGroup>
       <JsonResourceTemp Include="@(JsonResource)"/>
       <JsonResource Remove="@(JsonResource)"/>
