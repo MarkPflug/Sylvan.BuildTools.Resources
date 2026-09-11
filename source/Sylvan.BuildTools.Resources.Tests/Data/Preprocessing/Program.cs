@@ -11,7 +11,7 @@ namespace Proj
 	}
 }
 
-class Program
+partial class Program
 {
 	public static void Main(string[] args)
 	{
