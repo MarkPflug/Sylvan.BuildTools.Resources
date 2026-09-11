@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+	<PropertyGroup>
+    <DocumentationFile>ProjComments.xml</DocumentationFile>
+    
+	</PropertyGroup>
+
+</Project>

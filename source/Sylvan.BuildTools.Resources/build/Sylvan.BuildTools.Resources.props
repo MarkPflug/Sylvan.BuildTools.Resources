@@ -5,6 +5,8 @@
   <PropertyGroup>
     <SylvanResourceTaskAssembly 
       Condition="'$(SylvanResourceTaskAssembly)' == ''">$(MSBuildThisFileDirectory)netstandard2.0/Sylvan.BuildTools.Resources.dll</SylvanResourceTaskAssembly>
+
+    <CodeGenerationRoot>$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(IntermediateOutputPath)))/SylvanJsonResources</CodeGenerationRoot>    
   </PropertyGroup>
 
   <ItemDefinitionGroup>
@@ -19,9 +21,14 @@
   <ItemGroup>
     <None Remove="**/*.resj"/>
     <JsonResource Include="**/*.resj"/>
-
-    <StaticResourceFiles
+    
+    <JsonResourceCode 
+      Include="@(JsonResource->'%(RecursiveDir)%(Filename)%(Extension).g.cs')"/>
+    <StaticResourceRes
+      Include="@(JsonResource->'%(RecursiveDir)%(Filename)%(Extension).resources')"/>
+    
+    <StaticResourceFiles      
       Include="%(StaticResourceFolder.Identity)/**/*"/>
-  </ItemGroup>
 
+  </ItemGroup>
 </Project>
